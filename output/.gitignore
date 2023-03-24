@@ -1,0 +1,22 @@
+# Image extensions
+*.bmp
+*.jpg
+*.pdf
+*.png
+*.ppm
+*.tiff
+*.vrml
+*.x3d
+
+# Scene extensions
+*.eps
+*.pdf
+*.ps
+*.svg
+*.pov
+*.webgl
+*.x3db
+
+# Animation extensions
+*.avi
+*.ogg
