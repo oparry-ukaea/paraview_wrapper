@@ -7,9 +7,34 @@ import re
 paraview.simple._DisableFirstRenderCameraReset()
 
 
-def gen_phi_movie(
-    data_dir, output_dir, animation_settings={}, output_fname="phi_movie.avi"
+def gen_opacity_pts(opacity_vals):
+    # Check types
+    try:
+        tmp_it1 = iter(opacity_vals)
+        tmp_it2 = iter(opacity_vals[0])
+    except TypeError:
+        print("opacity_values must be a list of 2-tuples [(val1,op1),(val2,op2)...]")
+        raise
+
+    pts = []
+    for val_op in opacity_vals:
+        pts.extend(val_op)
+        pts.extend((0.5, 0.0))
+    return pts
+
+
+def gen_movie(
+    varname,
+    data_dir,
+    output_dir,
+    animation_settings={},
+    data_settings={},
+    display_settings={},
+    camera_settings={},
+    output_fname="",
 ):
+    if not output_fname:
+        output_fname = f"{varname}_movie.avi"
 
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
@@ -20,137 +45,112 @@ def gen_phi_movie(
         registrationName="vtu_data", FileName=vtu_fpaths
     )
 
-    vtu_data.PointArrayStatus = ["ne", "Ge", "Gd", "w", "phi"]
-
     # get animation scene
-    animationScene1 = GetAnimationScene()
+    anim_scene = GetAnimationScene()
 
     # update animation scene based on data timesteps
-    animationScene1.UpdateAnimationUsingDataTimeSteps()
+    anim_scene.UpdateAnimationUsingDataTimeSteps()
 
     # set active source
     SetActiveSource(vtu_data)
 
     # get active view
-    renderView1 = FindViewOrCreate("genPhiMovie", "RenderView")
+    view = FindViewOrCreate(f"gen_{varname}_movie", "RenderView")
 
     # show data in view
-    lapd_Display = Show(vtu_data, renderView1, "UnstructuredGridRepresentation")
-
-    # trace defaults for the display properties.
-    lapd_Display.Representation = "Surface"
-    lapd_Display.ColorArrayName = [None, ""]
-    lapd_Display.SelectTCoordArray = "None"
-    lapd_Display.SelectNormalArray = "None"
-    lapd_Display.SelectTangentArray = "None"
-    lapd_Display.OSPRayScaleArray = "Gd"
-    lapd_Display.OSPRayScaleFunction = "PiecewiseFunction"
-    lapd_Display.SelectOrientationVectors = "None"
-    lapd_Display.SelectScaleArray = "Gd"
-    lapd_Display.GlyphType = "Arrow"
-    lapd_Display.GlyphTableIndexArray = "Gd"
-    lapd_Display.GaussianRadius = 0.05
-    lapd_Display.SetScaleArray = ["POINTS", "Gd"]
-    lapd_Display.ScaleTransferFunction = "PiecewiseFunction"
-    lapd_Display.OpacityArray = ["POINTS", "Gd"]
-    lapd_Display.OpacityTransferFunction = "PiecewiseFunction"
-    lapd_Display.DataAxesGrid = "GridAxesRepresentation"
-    lapd_Display.PolarAxes = "PolarAxesRepresentation"
-    lapd_Display.ScalarOpacityUnitDistance = 0.32402688287327763
-    lapd_Display.OpacityArrayName = ["POINTS", "Gd"]
+    display = Show(vtu_data, view, "UnstructuredGridRepresentation")
 
     # init the 'PiecewiseFunction' selected for 'ScaleTransferFunction'
-    lapd_Display.ScaleTransferFunction.Points = [
+    display.ScaleTransferFunction.Points = [
         0.0,
         0.0,
         0.5,
         0.0,
-        1.1757813367477812e-38,
+        0.0,
         1.0,
         0.5,
         0.0,
     ]
 
     # init the 'PiecewiseFunction' selected for 'OpacityTransferFunction'
-    lapd_Display.OpacityTransferFunction.Points = [
+    display.OpacityTransferFunction.Points = [
         0.0,
         0.0,
         0.5,
         0.0,
-        1.1757813367477812e-38,
+        0.0,
         1.0,
         0.5,
         0.0,
     ]
 
     # reset view to fit data
-    renderView1.ResetCamera(False)
+    view.ResetCamera(False)
 
     # set scalar coloring
-    ColorBy(lapd_Display, ("POINTS", "phi"))
+    ColorBy(display, ("POINTS", varname))
 
     # rescale color and/or opacity maps used to include current data range
-    lapd_Display.RescaleTransferFunctionToDataRange(True, False)
+    display.RescaleTransferFunctionToDataRange(True, False)
 
     # show color bar/color legend
-    lapd_Display.SetScalarBarVisibility(renderView1, True)
+    display.SetScalarBarVisibility(view, True)
 
-    # get color transfer function/color map for 'phi'
-    phiLUT = GetColorTransferFunction("phi")
+    # Data settings
+    int_data_settings = dict(range=[0, 1])
+    int_data_settings.update(data_settings)
 
-    # get opacity transfer function/opacity map for 'phi'
-    phiPWF = GetOpacityTransferFunction("phi")
+    # get color transfer function/color map for variable
+    color_map = GetColorTransferFunction(varname)
+    # Rescale transfer function
+    color_map.RescaleTransferFunction(*int_data_settings["range"])
+
+    if "opacities" in data_settings:
+        opacity_map = GetOpacityTransferFunction(varname)
+        opacity_map.Points = gen_opacity_pts(data_settings["opacities"])
+        color_map.EnableOpacityMapping = 1
 
     # change representation type
-    lapd_Display.SetRepresentationType("Volume")
-
-    # Rescale transfer function
-    phiLUT.RescaleTransferFunction(-0.5, 0.5)
-
-    # Properties modified on phiPWF
-    phiPWF.Points = [-0.5, 1.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 1.0, 0.5, 0.0]
-
-    # Properties modified on phiLUT
-    phiLUT.EnableOpacityMapping = 1
+    display.SetRepresentationType("Volume")
 
     # Properties modified on lapd_Display
-    lapd_Display.SelectMapper = "Resample To Image"
+    display.SelectMapper = "Resample To Image"
 
-    # Properties modified on renderView1.AxesGrid
-    renderView1.AxesGrid.Visibility = 1
+    # Properties modified on view.AxesGrid
+    view.AxesGrid.Visibility = 1
 
-    # get layout
-    layout1 = GetLayout()
+    # Default camera settings
+    int_camera_settings = dict(
+        pos=[16.3, 3.1, 21.9], fpt=[0.0, 0.0, 5.0], up=[0.0, 1.0, -0.30], pscale=6.1
+    )
+    # Apply any camera settings passed by the user
+    int_camera_settings.update(camera_settings)
+    view.CameraPosition = int_camera_settings["pos"]
+    view.CameraFocalPoint = int_camera_settings["fpt"]
+    view.CameraViewUp = int_camera_settings["up"]
+    view.CameraParallelScale = int_camera_settings["pscale"]
 
-    # layout/tab size in pixels
-    layout1.SetSize(1122, 784)
+    # Default animation settings
+    int_animation_settings = dict(ImageResolution=[1120, 784], FrameRate=5)
+    # Apply any animation settings passed by the user
+    int_animation_settings.update(animation_settings)
 
-    # current camera placement for renderView1
-    renderView1.CameraPosition = [
-        16.316036635926093,
-        3.0728705414900985,
-        21.856809789093937,
-    ]
-    renderView1.CameraFocalPoint = [0.0, 0.0, 5.0]
-    renderView1.CameraViewUp = [
-        0.021026296521089036,
-        0.9797822758171143,
-        -0.1989587566538437,
-    ]
-    renderView1.CameraParallelScale = 6.123724356957945
+    if "FrameWindow" in int_animation_settings:
+        nframes_max = len(vtu_fpaths)
+        fw = int_animation_settings["FrameWindow"]
+        fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
 
-    # Default animation
-    SaveAnimation_settings = dict(ImageResolution=[1120, 784], FrameRate=5)
-    # Apply any settings passed by user
-    SaveAnimation_settings.update(animation_settings)
+    # Set layout/tab size in pixels
+    layout = GetLayout()
+    layout.SetSize(*int_animation_settings["ImageResolution"])
 
     print("Saving animation...")
 
     # save animation
     SaveAnimation(
         output_fpath,
-        renderView1,
-        **SaveAnimation_settings,
+        view,
+        **int_animation_settings,
     )
 
     print(f"Saved animation to {output_fpath}")
