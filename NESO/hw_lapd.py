@@ -12,6 +12,8 @@ def gen_opacity_pts(opacity_vals):
     try:
         tmp_it1 = iter(opacity_vals)
         tmp_it2 = iter(opacity_vals[0])
+        if len(opacity_vals[0]) != 2:
+            raise TypeError
     except TypeError:
         print("opacity_values must be a list of 2-tuples [(val1,op1),(val2,op2)...]")
         raise
