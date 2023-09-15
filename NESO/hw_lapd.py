@@ -70,7 +70,10 @@ def gen_movie(
     # Particle data
     if particle_fname:
         int_particle_props = dict(
-            colorby="COMPUTATIONAL_WEIGHT", cbar_vals=[1e14 * x for x in [0, 1, 2, 3]]
+            colorby="COMPUTATIONAL_WEIGHT",
+            cbar_title="Particle Weight",
+            cbar_pos=[0.05, 0.9],
+            cbar_vals=[1e14 * x for x in [0, 0.5, 1, 1.5, 2, 2.5]],
         )
         int_particle_props.update(particle_props)
         particle_fpath = os.path.join(data_dir, particle_fname)
@@ -85,6 +88,16 @@ def gen_movie(
         part_color_tf.RescaleTransferFunction(
             int_particle_props["cbar_vals"][0], int_particle_props["cbar_vals"][-1]
         )
+
+        part_cbar = GetScalarBar(part_color_tf, view)
+        part_cbar.ComponentTitle = ""
+        part_cbar.Orientation = "Horizontal"
+        part_cbar.ScalarBarLength = 0.25
+        part_cbar.WindowLocation = "Any Location"
+        part_cbar.Title = int_particle_props["cbar_title"]
+        part_cbar.Position = int_particle_props["cbar_pos"]
+        part_cbar.UseCustomLabels = 1
+        part_cbar.CustomLabels = int_particle_props["cbar_vals"]
 
     # init the 'PiecewiseFunction' selected for 'ScaleTransferFunction'
     display.ScaleTransferFunction.Points = [
