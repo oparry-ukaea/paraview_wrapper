@@ -29,6 +29,7 @@ def gen_movie(
     varname,
     data_dir,
     output_dir,
+    vtu_basename="",
     animation_settings={},
     data_settings={},
     display_settings={},
@@ -40,7 +41,7 @@ def gen_movie(
 
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
-    vtu_fpaths = glob(f"{data_dir}/*.vtu")
+    vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
     pattern = re.compile(r".*_([0-9]*).vtu")
     vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
     vtu_data = XMLUnstructuredGridReader(
