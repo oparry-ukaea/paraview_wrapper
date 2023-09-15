@@ -133,7 +133,7 @@ def gen_movie(
     view.CameraParallelScale = int_camera_settings["pscale"]
 
     # Default animation settings
-    int_animation_settings = dict(ImageResolution=[1120, 784], FrameRate=5)
+    int_animation_settings = dict(ImageResolution=[1920, 1080], FrameRate=5)
     # Apply any animation settings passed by the user
     int_animation_settings.update(animation_settings)
 
