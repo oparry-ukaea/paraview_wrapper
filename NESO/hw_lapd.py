@@ -29,6 +29,8 @@ def gen_movie(
     varname,
     data_dir,
     output_dir,
+    particle_fname="",
+    particle_props={},
     vtu_basename="",
     animation_settings={},
     data_settings={},
@@ -41,6 +43,8 @@ def gen_movie(
 
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
+
+    # Fluid vtus
     vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
     pattern = re.compile(r".*_([0-9]*).vtu")
     vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
@@ -60,8 +64,27 @@ def gen_movie(
     # get active view
     view = FindViewOrCreate(f"gen_{varname}_movie", "RenderView")
 
-    # show data in view
+    # show vtu data in view
     display = Show(vtu_data, view, "UnstructuredGridRepresentation")
+
+    # Particle data
+    if particle_fname:
+        int_particle_props = dict(
+            colorby="COMPUTATIONAL_WEIGHT", cbar_vals=[1e14 * x for x in [0, 1, 2, 3]]
+        )
+        int_particle_props.update(particle_props)
+        particle_fpath = os.path.join(data_dir, particle_fname)
+        part_data = H5PartReader(
+            registrationName=particle_fname,
+            FileName=particle_fpath,
+        )
+        part_display = Show(part_data, view, "GeometryRepresentation")
+        ColorBy(part_display, ("POINTS", int_particle_props["colorby"]))
+        part_color_tf = GetColorTransferFunction(int_particle_props["colorby"])
+
+        part_color_tf.RescaleTransferFunction(
+            int_particle_props["cbar_vals"][0], int_particle_props["cbar_vals"][-1]
+        )
 
     # init the 'PiecewiseFunction' selected for 'ScaleTransferFunction'
     display.ScaleTransferFunction.Points = [
