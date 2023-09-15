@@ -140,14 +140,25 @@ def gen_movie(
     int_data_settings.update(data_settings)
 
     # get color transfer function/color map for variable
-    color_map = GetColorTransferFunction(varname)
+    color_tf = GetColorTransferFunction(varname)
     # Rescale transfer function
-    color_map.RescaleTransferFunction(*int_data_settings["range"])
+    color_tf.RescaleTransferFunction(*int_data_settings["range"])
 
     if "opacities" in data_settings:
         opacity_map = GetOpacityTransferFunction(varname)
         opacity_map.Points = gen_opacity_pts(data_settings["opacities"])
-        color_map.EnableOpacityMapping = 1
+        color_tf.EnableOpacityMapping = 1
+
+    # Color bar properties
+    cbar = GetScalarBar(color_tf, view)
+    cbar.ComponentTitle = ""
+    cbar.Orientation = "Vertical"
+    cbar.ScalarBarLength = 0.35
+    cbar.WindowLocation = "Any Location"
+    cbar.Title = "$n_e~/~10^{17} m^{-3}$"
+    cbar.Position = [0.92, 0.08]
+    # cbar.UseCustomLabels = 1
+    # cbar.CustomLabels = int_particle_props["cbar_vals"]
 
     # change representation type
     display.SetRepresentationType("Volume")
@@ -155,8 +166,9 @@ def gen_movie(
     # Properties modified on lapd_Display
     display.SelectMapper = "Resample To Image"
 
-    # Properties modified on view.AxesGrid
+    # Make coordinate axes visible, hide xyz pointer
     view.AxesGrid.Visibility = 1
+    view.OrientationAxesVisibility = 0
 
     # Default camera settings
     int_camera_settings = dict(
