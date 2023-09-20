@@ -33,6 +33,7 @@ def gen_movie(
     particle_props={},
     vtu_basename="",
     animation_settings={},
+    cbar_settings={},
     data_settings={},
     display_settings={},
     camera_settings={},
@@ -150,15 +151,25 @@ def gen_movie(
         color_tf.EnableOpacityMapping = 1
 
     # Color bar properties
+    int_cbar_settings = dict(
+        len=0.35,
+        loc="Any Location",
+        orient="Vertical",
+        pos=[0.92, 0.08],
+        title=varname,
+        vals=[],
+    )
+    int_cbar_settings.update(cbar_settings)
     cbar = GetScalarBar(color_tf, view)
     cbar.ComponentTitle = ""
-    cbar.Orientation = "Vertical"
-    cbar.ScalarBarLength = 0.35
-    cbar.WindowLocation = "Any Location"
-    cbar.Title = "$n_e~/~10^{17} m^{-3}$"
-    cbar.Position = [0.92, 0.08]
-    # cbar.UseCustomLabels = 1
-    # cbar.CustomLabels = int_particle_props["cbar_vals"]
+    cbar.Orientation = int_cbar_settings["orient"]
+    cbar.ScalarBarLength = int_cbar_settings["len"]
+    cbar.WindowLocation = int_cbar_settings["loc"]
+    cbar.Title = int_cbar_settings["title"]
+    cbar.Position = int_cbar_settings["pos"]
+    if int_cbar_settings["vals"]:
+        cbar.UseCustomLabels = 1
+        cbar.CustomLabels = int_cbar_settings["vals"]
 
     # change representation type
     display.SetRepresentationType("Volume")
