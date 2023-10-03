@@ -10,8 +10,12 @@ def avi_to_mp4(
     overwrite_output=True,
     ffmpeg_output_options={},
 ):
+    if not os.path.isdir(common_dir):
+        raise FileNotFoundError(f"avi_to_mp4: No directory at {common_dir}")
     if not fpath_in:
         fpath_in = os.path.join(common_dir, fbase + ".avi")
+    if not os.path.isfile(fpath_in):
+        raise FileNotFoundError(f"avi_to_mp4: No input file at {fpath_in}")
     if not fpath_out:
         fpath_out = os.path.join(common_dir, fbase + ".mp4")
     ffmpeg_output_options_int = dict(
