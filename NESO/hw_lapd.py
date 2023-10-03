@@ -147,7 +147,7 @@ def gen_movie(
     display.SetScalarBarVisibility(view, True)
 
     # Data settings
-    int_data_settings = dict(range=[0, 1], render_mode="Resample To Image")
+    int_data_settings = dict(range=[0, 1], render_mode="Resample To Image", render_type="Volume")
     int_data_settings.update(data_settings)
 
     # get color transfer function/color map for variable
@@ -182,16 +182,17 @@ def gen_movie(
         cbar.CustomLabels = int_cbar_settings["vals"]
 
     # change representation type
-    display.SetRepresentationType("Volume")
+    display.SetRepresentationType(int_data_settings["render_type"])
 
     # Properties modified on lapd_Display
-    display.SelectMapper = int_data_settings["render_mode"]
+    if int_data_settings["render_type"] == "Volume":
+        display.SelectMapper = int_data_settings["render_mode"]
 
     # Make coordinate axes visible, hide xyz pointer
     if int_data_settings["render_mode"] == "Resample To Image":
         view.AxesGrid.Visibility = 1
     else:
-        view.AxesGrid.Visibility = 1
+        view.AxesGrid.Visibility = 0
     view.OrientationAxesVisibility = 0
 
     # Default camera settings
