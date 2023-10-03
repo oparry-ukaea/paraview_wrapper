@@ -38,6 +38,7 @@ def gen_movie(
     display_settings={},
     camera_settings={},
     output_fname="",
+    host="",
 ):
     if not output_fname:
         output_fname = f"{varname}_movie.avi"
@@ -46,9 +47,18 @@ def gen_movie(
     output_fpath = os.path.join(output_dir, output_fname)
 
     # Fluid vtus
-    vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
-    pattern = re.compile(r".*_([0-9]*).vtu")
-    vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+    if host:
+        Connect(host)
+        if vtu_basename and "FrameWindow" in animation_settings:
+            fw = animation_settings["FrameWindow"]
+            vtu_fpaths = [f"{data_dir}/{vtu_basename}{n}.vtu" for n in range(*fw)]
+        else:
+            raise RuntimeError("Must specify vtu_basename and animation_settings['FrameWindow'] when using remote host")
+    else:
+        vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
+        pattern = re.compile(r".*_([0-9]*).vtu")
+        vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+    
     vtu_data = XMLUnstructuredGridReader(
         registrationName="vtu_data", FileName=vtu_fpaths
     )
