@@ -84,6 +84,7 @@ def gen_movie(
             cbar_title="Particle Weight",
             cbar_pos=[0.05, 0.9],
             cbar_vals=[1e14 * x for x in [0, 0.5, 1, 1.5, 2, 2.5]],
+            psize=2,
         )
         int_particle_props.update(particle_props)
         particle_fpath = os.path.join(data_dir, particle_fname)
@@ -98,6 +99,8 @@ def gen_movie(
         part_color_tf.RescaleTransferFunction(
             int_particle_props["cbar_vals"][0], int_particle_props["cbar_vals"][-1]
         )
+
+        part_display.PointSize = int_particle_props["psize"]
 
         part_cbar = GetScalarBar(part_color_tf, view)
         part_cbar.ComponentTitle = ""
