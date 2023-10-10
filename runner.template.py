@@ -18,7 +18,7 @@ gen_movie(
     particle_props=dict(),
     vtu_basename="[NOT_SET]",
     animation_settings=dict(FrameRate=8, FrameWindow=[0, 200], Quality=2),
-    camera_settings=dict(
+    view_settings=dict(
         pos=[4.2, 19.0, 3.2], fpt=[0.0, 0.0, 5.0], up=[1.0, -0.2, 0.1], pscale=6.1
     ),
     data_settings=dict(

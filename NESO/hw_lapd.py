@@ -35,7 +35,7 @@ def gen_movie(
     animation_settings={},
     cbar_settings={},
     data_settings={},
-    camera_settings={},
+    view_settings={},
     output_fname="",
     host="",
 ):
@@ -187,23 +187,27 @@ def gen_movie(
     if int_data_settings["render_type"] == "Volume":
         display.SelectMapper = int_data_settings["render_mode"]
 
-    # Make coordinate axes visible, hide xyz pointer
-    if int_data_settings["render_mode"] == "Resample To Image":
-        view.AxesGrid.Visibility = 1
-    else:
-        view.AxesGrid.Visibility = 0
-    view.OrientationAxesVisibility = 0
-
     # Default camera settings
-    int_camera_settings = dict(
-        pos=[16.3, 3.1, 21.9], fpt=[0.0, 0.0, 5.0], up=[0.0, 1.0, -0.30], pscale=6.1
+    int_view_settings = dict(
+        pos=[16.3, 3.1, 21.9], fpt=[0.0, 0.0, 5.0], up=[0.0, 1.0, -0.30], pscale=6.1, show_axes_grid=1, show_orient_axes=0,
     )
     # Apply any camera settings passed by the user
-    int_camera_settings.update(camera_settings)
-    view.CameraPosition = int_camera_settings["pos"]
-    view.CameraFocalPoint = int_camera_settings["fpt"]
-    view.CameraViewUp = int_camera_settings["up"]
-    view.CameraParallelScale = int_camera_settings["pscale"]
+    int_view_settings.update(view_settings)
+
+    # Set coordinate axes visibility. Always hide if doing projected tetra rendering
+    view.AxesGrid.Visibility = int_view_settings["show_axes_grid"]
+    if int_data_settings["render_mode"] == "Projected tetra":
+        if int_view_settings["show_axes_grid"]:
+            print("Rendering in 'Projected tetra' mode; hiding coord axes")
+        view.AxesGrid.Visibility = 0
+
+    view.CameraPosition = int_view_settings["pos"]
+    view.CameraFocalPoint = int_view_settings["fpt"]
+    view.CameraViewUp = int_view_settings["up"]
+    view.CameraParallelScale = int_view_settings["pscale"]
+
+    # Show / hide xyz pointer
+    view.OrientationAxesVisibility = int_view_settings["show_orient_axes"]
 
     # Default animation settings
     int_animation_settings = dict(ImageResolution=[1920, 1080], FrameRate=5)
