@@ -35,7 +35,6 @@ def gen_movie(
     animation_settings={},
     cbar_settings={},
     data_settings={},
-    display_settings={},
     camera_settings={},
     output_fname="",
     host="",
