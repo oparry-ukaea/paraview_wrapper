@@ -81,6 +81,7 @@ def gen_movie(
     if particle_fname:
         int_particle_props = dict(
             colorby="COMPUTATIONAL_WEIGHT",
+            cbar_len=0.25,
             cbar_title="Particle Weight",
             cbar_pos=[0.05, 0.9],
             cbar_vals=[1e14 * x for x in [0, 0.5, 1, 1.5, 2, 2.5]],
@@ -105,7 +106,7 @@ def gen_movie(
         part_cbar = GetScalarBar(part_color_tf, view)
         part_cbar.ComponentTitle = ""
         part_cbar.Orientation = "Horizontal"
-        part_cbar.ScalarBarLength = 0.25
+        part_cbar.ScalarBarLength = int_particle_props["cbar_len"]
         part_cbar.WindowLocation = "Any Location"
         part_cbar.Title = int_particle_props["cbar_title"]
         part_cbar.Position = int_particle_props["cbar_pos"]
