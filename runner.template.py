@@ -1,8 +1,8 @@
-from NESO import gen_movie, plot_fluid_particle_img
+from NESO import gen_movie, gen_img
 from utils import get_desktop_dir, get_output_dir, avi_to_mp4
 
 
-plot_fluid_particle_img(
+gen_img(
     data_dir="[NOT_SET]",
     output_dir=get_output_dir(),
     output_time=39.0,

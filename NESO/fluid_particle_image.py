@@ -18,7 +18,7 @@ from paraview.simple import (
 )
 
 
-def plot_fluid_particle_img(
+def gen_img(
     data_dir,
     output_dir=".",
     output_time=36.0,
