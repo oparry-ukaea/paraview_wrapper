@@ -1,5 +1,5 @@
-from NESO import gen_movie, gen_img
-from utils import get_desktop_dir, get_output_dir, avi_to_mp4
+from paraview_sandbox.NESO import gen_movie, gen_img
+from paraview_sandbox.utils import get_desktop_dir, get_output_dir, avi_to_mp4
 
 
 gen_img(
