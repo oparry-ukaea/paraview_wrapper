@@ -1,28 +1,36 @@
-from paraview_sandbox.NESO import gen_movie, gen_img
-from paraview_sandbox.utils import get_desktop_dir, get_output_dir, avi_to_mp4
-
-
-gen_img(
-    data_dir="[NOT_SET]",
-    output_dir=get_output_dir(),
-    output_time=39.0,
+from examples import (
+    lapd_ne_blob_split,
+    t4c2_img,
+    t4c3_movie_coupled_fades_zoomed_out,
+    t4c3_movie_fluid_full,
+    t4c3_movie_coupled_zoomed_out,
+    t4c3_movie_w_remote,
+    t4c3_movie_zoomed_blob,
 )
 
-fld_name = "ne"
-gen_movie(
-    fld_name,
-    data_dir="[NOT_SET]",
-    output_dir=get_desktop_dir(),
-    output_fname=f"{fld_name}.avi",
-    particle_fname="particle_trajectory.h5part",
-    particle_props=dict(),
-    vtu_basename="[NOT_SET]",
-    animation_settings=dict(FrameRate=8, FrameWindow=[0, 200], Quality=2),
-    view_settings=dict(
-        pos=[4.2, 19.0, 3.2], fpt=[0.0, 0.0, 5.0], up=[1.0, -0.2, 0.1], pscale=6.1
-    ),
-    data_settings=dict(
-        range=[-0.5, 5.0], opacities=[(-0.5, 0.0), (0.3, 0.0), (1.5, 0.8), (5.0, 1.0)]
-    ),
-)
-avi_to_mp4(get_desktop_dir(), fld_name)
+
+# Render LAPD blob-splitting sim
+lapd_sim_path = ""
+lapd_ne_blob_split(lapd_sim_path)
+
+
+# Render fluid-particle image from t4c2 report
+t4c2_path = ""
+t4c2_img(t4c2_path)
+
+
+# t4c3 coupled movies on remote host
+t4c3_coupled_path_remote = ""
+host_ip = ""
+t4c3_movie_coupled_zoomed_out(t4c3_coupled_path_remote, host_ip)
+t4c3_movie_w_remote(t4c3_coupled_path_remote, host_ip)
+
+# t4c3 fluid-only movie on remote host
+t4c3_fluid_only_path_remote = ""
+t4c3_movie_fluid_full(t4c3_fluid_only_path_remote, host_ip)
+
+
+# Render t4c3 movies locally
+t4c3_coupled_path_local = ""
+t4c3_movie_coupled_fades_zoomed_out(t4c3_coupled_path_local)
+t4c3_movie_zoomed_blob(t4c3_coupled_path_local)
