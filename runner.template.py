@@ -34,3 +34,7 @@ t4c3_movie_fluid_full(t4c3_fluid_only_path_remote, host_ip)
 t4c3_coupled_path_local = ""
 t4c3_movie_coupled_fades_zoomed_out(t4c3_coupled_path_local)
 t4c3_movie_zoomed_blob(t4c3_coupled_path_local)
+
+# 1D line plot
+data_dir_1d = ""
+ne_Ge_line_plot(data_dir_1d)

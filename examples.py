@@ -1,4 +1,4 @@
-from paraview_sandbox.NESO import gen_movie, gen_img
+from paraview_sandbox.NESO import gen_movie, gen_img, line_plot_1d
 from paraview_sandbox.utils import get_desktop_dir, get_output_dir, avi_to_mp4
 
 
@@ -18,6 +18,21 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
         data_settings=dict(range=[1.0, 1.4], opacities=[(1.0, 0.0), (1.4, 1.0)]),
     )
     avi_to_mp4(get_desktop_dir(), output_basename)
+
+
+def ne_Ge_line_plot(data_dir, output_dir=get_desktop_dir()):
+    animation_settings = dict(FrameRate=12)
+    plot_settings = dict(xrange=[0.0, 2.0], yrange=[-4, 8.0])
+    tlbl_settings = dict(dt=500 * 1e-6)
+    line_plot_1d(
+        ["ne", "Ge"],
+        data_dir,
+        output_dir,
+        dt=1e-6,
+        animation_settings=animation_settings,
+        plot_settings=plot_settings,
+        tlbl_settings=tlbl_settings,
+    )
 
 
 def t4c2_img(data_dir, output_dir=get_desktop_dir()):
