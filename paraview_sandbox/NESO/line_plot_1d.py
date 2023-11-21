@@ -7,6 +7,12 @@ import re
 paraview.simple._DisableFirstRenderCameraReset()
 
 
+class PyExpr:
+    def __init__(self, name, expr):
+        self.name = name
+        self.expr = expr
+
+
 def line_plot_1d(
     varnames,
     data_dir,
@@ -14,6 +20,7 @@ def line_plot_1d(
     dt=None,
     vtu_basename="",
     animation_settings={},
+    exprs_to_plot=[],
     output_fname="",
     plot_settings={},
     tlbl_settings={},
@@ -23,6 +30,10 @@ def line_plot_1d(
     default_lbl = f"{var_str}_line_plot"
     if not output_fname:
         output_fname = f"{default_lbl}.avi"
+
+    # Ensure expressions are all instances instances of PyExpr
+    for expr in exprs_to_plot:
+        assert isinstance(expr, PyExpr)
 
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
@@ -60,8 +71,18 @@ def line_plot_1d(
     # Show data in view
     data_display = Show(vtu_data, data_view, "UnstructuredGridRepresentation")
 
+    line_plot_inputs = [vtu_data]
+    for expr_props in exprs_to_plot:
+        expr = PythonCalculator(
+            registrationName=expr_props.name, Input=line_plot_inputs[-1]
+        )
+        expr.Expression = expr_props.expr
+        expr.ArrayName = expr_props.name
+        tmp_display = Show(expr, data_view, "UnstructuredGridRepresentation")
+        line_plot_inputs.append(expr)
+
     # Create line plot
-    line_plot = PlotOverLine(registrationName="line_plot", Input=vtu_data)
+    line_plot = PlotOverLine(registrationName="line_plot", Input=line_plot_inputs[-1])
 
     # set active source
     SetActiveSource(line_plot)
@@ -71,10 +92,11 @@ def line_plot_1d(
 
     view = CreateView("XYChartView")
 
+    # ylabel=" or ".join(varnames)
     # Apply settings
     int_plot_settings = dict(
         xlabel="x",
-        ylabel=" / ".join(varnames),
+        ylabel="",
         xrange=[0.0, 2.0],
         yrange=[-1.1, 2.2],
         font_size=16,
@@ -83,8 +105,6 @@ def line_plot_1d(
 
     # show line plot in view
     display = Show(line_plot, view, "XYChartRepresentation")
-
-    # display.XArrayName = "Points_X"
 
     view.BottomAxisRangeMinimum = int_plot_settings["xrange"][0]
     view.BottomAxisRangeMaximum = int_plot_settings["xrange"][1]
@@ -100,7 +120,7 @@ def line_plot_1d(
     view.LeftAxisUseCustomRange = 1
 
     if dt is not None:
-        tlbl_settings_int = dict(pos=[0.6, 0.1], fmt=".1E")
+        tlbl_settings_int = dict(pos=[0.65, 0.1], fmt=".1E")
         tlbl_settings_int.update(tlbl_settings)
         # Create'Annotate Time Filter'
         annotate_time_filter = AnnotateTimeFilter(

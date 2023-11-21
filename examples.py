@@ -1,4 +1,4 @@
-from paraview_sandbox.NESO import gen_movie, gen_img, line_plot_1d
+from paraview_sandbox.NESO import gen_movie, gen_img, line_plot_1d, PyExpr
 from paraview_sandbox.utils import get_desktop_dir, get_output_dir, avi_to_mp4
 
 
@@ -20,16 +20,29 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
     avi_to_mp4(get_desktop_dir(), output_basename)
 
 
-def ne_Ge_line_plot(data_dir, output_dir=get_desktop_dir()):
-    animation_settings = dict(FrameRate=12)
-    plot_settings = dict(xrange=[0.0, 2.0], yrange=[-4, 8.0])
-    tlbl_settings = dict(dt=500 * 1e-6)
+def ne_Ge_line_plot(
+    data_dir,
+    delta=0.1,
+    output_dir=get_desktop_dir(),
+    animation_settings={},
+    dt_chk=5e-4,
+):
+    plot_settings = dict(xrange=[0.0, 2.0], yrange=[-1.2, 1.1 * (delta + 1 / delta)])
+    tlbl_settings = {}
+    exprs_to_plot = [
+        PyExpr(
+            "ne Equilibrium",
+            f"0.5*(({delta}+1/{delta})+sqrt(({delta}+1/{delta})**2-4*(inputs[0].Points[:,0]-1)**2))",
+        ),
+        PyExpr("Ge Equilibrium", "inputs[0].Points[:,0]-1"),
+    ]
     line_plot_1d(
         ["ne", "Ge"],
         data_dir,
         output_dir,
-        dt=1e-6,
+        dt=dt_chk,
         animation_settings=animation_settings,
+        exprs_to_plot=exprs_to_plot,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
     )
