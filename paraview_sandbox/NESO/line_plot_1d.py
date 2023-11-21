@@ -106,6 +106,12 @@ def line_plot_1d(
     # show line plot in view
     display = Show(line_plot, view, "XYChartRepresentation")
 
+    lstys = display.SeriesLineStyle.GetData()
+    for expr in exprs_to_plot:
+        idx = lstys.index(expr.name)
+        lstys[idx + 1] = "2"
+    display.SeriesLineStyle.SetData(lstys)
+
     view.BottomAxisRangeMinimum = int_plot_settings["xrange"][0]
     view.BottomAxisRangeMaximum = int_plot_settings["xrange"][1]
     view.BottomAxisTitle = int_plot_settings["xlabel"]
