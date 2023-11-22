@@ -71,6 +71,7 @@ def line_plot_1d(
     # Show data in view
     data_display = Show(vtu_data, data_view, "UnstructuredGridRepresentation")
 
+    # Plot python expressions, daisy-chaining inputs so that paraview plots the correct sources.
     line_plot_inputs = [vtu_data]
     for expr_props in exprs_to_plot:
         expr = PythonCalculator(

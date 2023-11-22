@@ -1,5 +1,10 @@
 from paraview_sandbox.NESO import gen_movie, gen_img, line_plot_1d, PyExpr
-from paraview_sandbox.utils import get_desktop_dir, get_output_dir, avi_to_mp4
+from paraview_sandbox.utils import (
+    avi_to_mp4,
+    get_desktop_dir,
+    get_nektar_params,
+    get_output_dir,
+)
 
 
 def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
@@ -22,11 +27,13 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
 
 def ne_Ge_line_plot(
     data_dir,
-    delta=0.1,
     output_dir=get_desktop_dir(),
+    output_fname="",
     animation_settings={},
-    dt_chk=5e-4,
 ):
+    nek_params = get_nektar_params(data_dir)
+    delta = float(nek_params["delta"])
+    dt_chk = float(nek_params["TimeStep"]) * float(nek_params["IO_CheckSteps"])
     plot_settings = dict(xrange=[0.0, 2.0], yrange=[-1.2, 1.1 * (delta + 1 / delta)])
     tlbl_settings = {}
     exprs_to_plot = [
@@ -43,6 +50,7 @@ def ne_Ge_line_plot(
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
+        output_fname=output_fname,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
     )
