@@ -3,6 +3,8 @@ import os.path
 from paraview.simple import *
 import re
 
+from ..utils import get_color_array
+
 ### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
@@ -101,6 +103,7 @@ def line_plot_1d(
         xrange=[0.0, 2.0],
         yrange=[-1.1, 2.2],
         font_size=16,
+        colors={},
         lstys={},
     )
     int_plot_settings.update(plot_settings)
@@ -111,14 +114,29 @@ def line_plot_1d(
     all_series.extend([expr.name for expr in exprs_to_plot])
     display.SeriesVisibility = all_series
 
+    # Set line colours and styles
+    cols = display.SeriesColor.GetData()
+    cols_to_add = []
     lstys = display.SeriesLineStyle.GetData()
     lstys_to_add = []
     for expr in exprs_to_plot:
-        idx = lstys.index(expr.name)
-        if idx >= 0:
-            lstys[idx + 1] = str(int_plot_settings["lstys"].get(expr.name, 2))
+        lsty_idx = lstys.index(expr.name)
+        if lsty_idx >= 0:
+            lstys[lsty_idx + 1] = str(int_plot_settings["lstys"].get(expr.name, 2))
         else:
-            lstys_to_add.append[expr.name, "2"]
+            lstys_to_add.extend([expr.name, "2"])
+        col_idx = cols.index(expr.name)
+        col_arr = get_color_array(
+            expr.name, int_plot_settings["colors"].get(expr.name, "r")
+        )
+        if col_idx >= 0:
+            for ii, el in enumerate(col_arr):
+                cols[col_idx + ii] = el
+        else:
+            lstys_to_add.extend(col_arr)
+    cols.extend(cols_to_add)
+    display.SeriesColor.SetData(cols)
+    lstys.extend(lstys)
     display.SeriesLineStyle.SetData(lstys)
 
     view.BottomAxisRangeMinimum = int_plot_settings["xrange"][0]
