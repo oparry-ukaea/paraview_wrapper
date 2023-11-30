@@ -34,8 +34,8 @@ def ne_Ge_line_plot(
     nek_params = get_nektar_params(data_dir)
 
     # Read params from the Nektar session file
-    delta = float(nek_params["delta"])
-    dt_chk = float(nek_params["TimeStep"]) * float(nek_params["IO_CheckSteps"])
+    delta = nek_params["delta"]
+    dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
     plot_settings = dict(xrange=[0.0, 2.0], yrange=[-1.2, 1.1 * (delta + 1 / delta)])
 
     tlbl_settings = {}

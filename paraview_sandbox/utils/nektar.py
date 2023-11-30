@@ -38,6 +38,33 @@ def find_nektar_config(dir):
     return nektar_configs[-1]
 
 
+def convert_str_dict(sd, d={}):
+    """
+    Convert Nektar params with string values to ints and floats.
+    Handle param references by calling recursively.
+    """
+    nd_in = len(d)
+    for k in list(sd.keys()):
+        try:
+            val = eval(sd[k])
+            discard = sd.pop(k)
+            d[k] = val
+        except:
+            pass
+    if sd and len(d) > nd_in:
+        for ks, vs in list(sd.items()):
+            for k, v in d.items():
+                if k in vs:
+                    sd[ks] = vs.replace(k, str(v))
+        convert_str_dict(sd, d)
+    for ks, vs in list(sd.items()):
+        print(
+            f"convert_str_dict: Unable to convert {ks} value {vs} to a number; discarding"
+        )
+
+    return d
+
+
 def get_nektar_params(dir, fname=""):
     """
     Read params node from Nektar XML and return in a dict
@@ -51,4 +78,5 @@ def get_nektar_params(dir, fname=""):
     tree = ET.parse(path)
     root = tree.getroot()
     params = root.find("./CONDITIONS/PARAMETERS")
-    return {t[0].strip(): t[1].strip() for t in [p.text.split("=") for p in params]}
+    str_dict = {t[0].strip(): t[1].strip() for t in [p.text.split("=") for p in params]}
+    return convert_str_dict(str_dict)
