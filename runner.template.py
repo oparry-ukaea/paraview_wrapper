@@ -1,6 +1,7 @@
 from examples import (
     lapd_ne_blob_split,
     ne_Ge_line_plot,
+    t4c2_1d_profs,
     t4c2_img,
     t4c3_movie_coupled_fades_zoomed_out,
     t4c3_movie_fluid_full,
@@ -39,3 +40,7 @@ t4c3_movie_zoomed_blob(t4c3_coupled_path_local)
 # 1D line plot
 data_dir_1d = ""
 ne_Ge_line_plot(data_dir_1d, animation_settings=dict(FrameRate=5))
+
+# 1D line plot (SimpleSOL)
+data_dir_simple_sol = ""
+t4c2_1d_profs(data_dir_simple_sol)
