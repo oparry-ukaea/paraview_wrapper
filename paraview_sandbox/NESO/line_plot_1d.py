@@ -101,16 +101,24 @@ def line_plot_1d(
         xrange=[0.0, 2.0],
         yrange=[-1.1, 2.2],
         font_size=16,
+        lstys={},
     )
     int_plot_settings.update(plot_settings)
 
     # show line plot in view
     display = Show(line_plot, view, "XYChartRepresentation")
+    all_series = varnames
+    all_series.extend([expr.name for expr in exprs_to_plot])
+    display.SeriesVisibility = all_series
 
     lstys = display.SeriesLineStyle.GetData()
+    lstys_to_add = []
     for expr in exprs_to_plot:
         idx = lstys.index(expr.name)
-        lstys[idx + 1] = "2"
+        if idx >= 0:
+            lstys[idx + 1] = str(int_plot_settings["lstys"].get(expr.name, 2))
+        else:
+            lstys_to_add.append[expr.name, "2"]
     display.SeriesLineStyle.SetData(lstys)
 
     view.BottomAxisRangeMinimum = int_plot_settings["xrange"][0]
