@@ -175,12 +175,20 @@ def t4c3_movie_coupled_zoomed_out(data_dir, host):
     avi_to_mp4(get_desktop_dir(), output_basename)
 
 
-def t4c3_movie_fluid_full(data_dir, host="", output_dir=get_desktop_dir()):
+def t4c3_movie_fluid_full(data_dir, host):
+    hw3d_fluid_only_movie(data_dir, host=host, output_basename="t4c3_fluid-only_turb")
+
+
+def hw3d_fluid_only_movie(
+    data_dir,
+    host="",
+    output_basename="3DHW",
+    output_dir=get_desktop_dir(),
+):
     """
     Movie showing turbulence in fluid-only t4c3 sim (params optimised to boost turbulence).
     Given to WA, ET for demos at IAEA FEC.
     """
-    output_basename = "t4c3_fluid-only_turb"
     gen_movie(
         "ne",
         data_dir=data_dir,

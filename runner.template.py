@@ -1,4 +1,5 @@
 from examples import (
+    hw3d_fluid_only_movie,
     lapd_ne_blob_split,
     ne_Ge_line_plot,
     t4c2_1d_profs,
@@ -36,6 +37,10 @@ t4c3_movie_fluid_full(t4c3_fluid_only_path_remote, host_ip)
 t4c3_coupled_path_local = ""
 t4c3_movie_coupled_fades_zoomed_out(t4c3_coupled_path_local)
 t4c3_movie_zoomed_blob(t4c3_coupled_path_local)
+
+# 3D HW (fluid-only) movie
+hw3d_path = ""
+hw3d_fluid_only_movie(hw3d_path)
 
 # 1D line plot
 data_dir_1d = ""
