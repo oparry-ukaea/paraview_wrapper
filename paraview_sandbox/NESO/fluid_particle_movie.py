@@ -6,6 +6,7 @@ import re
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
+
 def gen_movie(
     varname,
     data_dir,
@@ -33,12 +34,16 @@ def gen_movie(
             fw = animation_settings["FrameWindow"]
             vtu_fpaths = [f"{data_dir}/{vtu_basename}{n}.vtu" for n in range(*fw)]
         else:
-            raise RuntimeError("Must specify vtu_basename and animation_settings['FrameWindow'] when using remote host")
+            raise RuntimeError(
+                "Must specify vtu_basename and animation_settings['FrameWindow'] when using remote host"
+            )
     else:
         vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
         pattern = re.compile(r".*_([0-9]*).vtu")
-        vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
-    
+        vtu_fpaths = sorted(
+            vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0])
+        )
+
     vtu_data = XMLUnstructuredGridReader(
         registrationName="vtu_data", FileName=vtu_fpaths
     )
@@ -131,7 +136,9 @@ def gen_movie(
     display.SetScalarBarVisibility(view, True)
 
     # Data settings
-    int_data_settings = dict(range=[0, 1], render_mode="Resample To Image", render_type="Volume")
+    int_data_settings = dict(
+        range=[0, 1], render_mode="Resample To Image", render_type="Volume"
+    )
     int_data_settings.update(data_settings)
 
     # get color transfer function/color map for variable
@@ -165,10 +172,8 @@ def gen_movie(
         cbar.UseCustomLabels = 1
         cbar.CustomLabels = int_cbar_settings["vals"]
 
-    # change representation type
+    # Display properties
     display.SetRepresentationType(int_data_settings["render_type"])
-
-    # Properties modified on lapd_Display
     if int_data_settings["render_type"] == "Volume":
         display.SelectMapper = int_data_settings["render_mode"]
 
