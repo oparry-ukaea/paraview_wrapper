@@ -3,6 +3,7 @@ import os.path
 from paraview.simple import *
 import re
 
+from .time_filter import add_time_filter
 from ..utils import get_color_array
 
 ### disable automatic camera reset on 'Show'
@@ -153,26 +154,7 @@ def line_plot_1d(
     view.LeftAxisUseCustomRange = 1
 
     if dt is not None:
-        tlbl_settings_int = dict(pos=[0.65, 0.1], fmt=".1E")
-        tlbl_settings_int.update(tlbl_settings)
-        # Create'Annotate Time Filter'
-        annotate_time_filter = AnnotateTimeFilter(
-            registrationName="annotate_time_filter", Input=vtu_data
-        )
-
-        annotate_time_filter.Format = "Time: {time:" + tlbl_settings_int["fmt"] + "}"
-        annotate_time_filter.Scale = dt
-
-        # show data in view
-        display_annotate_time_filter = Show(
-            annotate_time_filter, view, "ChartTextRepresentation"
-        )
-
-        # Properties modified on display_annotate_time_filter
-        display_annotate_time_filter.LabelLocation = "Any Location"
-
-        # Properties modified on display_annotate_time_filter
-        display_annotate_time_filter.Position = tlbl_settings_int["pos"]
+        add_time_filter(dt, vtu_data, view, tlbl_settings)
 
     # Default animation settings
     int_animation_settings = dict(FrameRate=5)
