@@ -184,6 +184,13 @@ def hw3d_fluid_only_movie(
     host="",
     output_basename="3DHW",
     output_dir=get_desktop_dir(),
+    animation_settings=dict(FrameRate=20, FrameWindow=[1, 160], Quality=2),
+    view_settings=dict(
+        pos=[21.68, 9.41, 11.91],
+        fpt=[0.0, 0.0, 5.0],
+        up=[-0.24, -0.15, 0.96],
+        pscale=6.1,
+    ),
 ):
     """
     Movie showing turbulence in fluid-only t4c3 sim (params optimised to boost turbulence).
@@ -194,18 +201,13 @@ def hw3d_fluid_only_movie(
         data_dir=data_dir,
         output_dir=output_dir,
         output_fname=f"{output_basename}.avi",
-        animation_settings=dict(FrameRate=20, FrameWindow=[1, 160], Quality=2),
+        animation_settings=animation_settings,
         cbar_settings=dict(title="Δn"),
         data_settings=dict(
             range=[-15.0, 15.0],
             opacities=[(-15.0, 1.0), (0.0, 0.0), (15.0, 1.0)],
         ),
-        view_settings=dict(
-            pos=[21.68, 9.41, 11.91],
-            fpt=[0.0, 0.0, 5.0],
-            up=[-0.24, -0.15, 0.96],
-            pscale=6.1,
-        ),
+        view_settings=view_settings,
         vtu_basename="hw_",
         host=host,
     )

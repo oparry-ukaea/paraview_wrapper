@@ -174,7 +174,12 @@ def gen_movie(
 
     # Default camera settings
     int_view_settings = dict(
-        pos=[16.3, 3.1, 21.9], fpt=[0.0, 0.0, 5.0], up=[0.0, 1.0, -0.30], pscale=6.1, show_axes_grid=1, show_orient_axes=0,
+        pos=[16.3, 3.1, 21.9],
+        fpt=[0.0, 0.0, 5.0],
+        up=[0.0, 1.0, -0.30],
+        pscale=6.1,
+        show_axes_grid=1,
+        show_orient_axes=0,
     )
     # Apply any camera settings passed by the user
     int_view_settings.update(view_settings)
