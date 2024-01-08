@@ -185,6 +185,7 @@ def hw3d_fluid_only_movie(
     output_basename="3DHW",
     output_dir=get_desktop_dir(),
     animation_settings=dict(FrameRate=20, FrameWindow=[1, 160], Quality=2),
+    max_val=15.0,
     view_settings=dict(
         pos=[21.68, 9.41, 11.91],
         fpt=[0.0, 0.0, 5.0],
@@ -204,8 +205,8 @@ def hw3d_fluid_only_movie(
         animation_settings=animation_settings,
         cbar_settings=dict(title="Δn"),
         data_settings=dict(
-            range=[-15.0, 15.0],
-            opacities=[(-15.0, 1.0), (0.0, 0.0), (15.0, 1.0)],
+            range=[-max_val, max_val],
+            opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
         ),
         view_settings=view_settings,
         vtu_basename="hw_",
