@@ -1,4 +1,5 @@
 from examples import (
+    driftwave_movie,
     hw3d_fluid_only_movie,
     lapd_ne_blob_split,
     ne_Ge_line_plot,
@@ -41,6 +42,10 @@ t4c3_movie_zoomed_blob(t4c3_coupled_path_local)
 # 3D HW (fluid-only) movie
 hw3d_path = ""
 hw3d_fluid_only_movie(hw3d_path)
+
+# 2D HW (nektar-driftwave)
+hw2d_path = ""
+driftwave_movie(hw2d_path)
 
 # 1D line plot
 data_dir_1d = ""

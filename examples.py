@@ -7,6 +7,50 @@ from paraview_sandbox.utils import (
 )
 
 
+def driftwave_movie(
+    data_dir,
+    host="",
+    output_basename="driftwave",
+    output_dir=get_desktop_dir(),
+    animation_settings=dict(FrameRate=15, FrameWindow=[1, 100], Quality=2),
+    max_val=1.0,
+    tlbl_settings=dict(pos=[0.02, 0.02], fontsize=32),
+    view_settings=dict(
+        pos=[6.4, 0.0, 109.3],
+        fpt=[6.4, 0.0, 0.0],
+        up=[0.0, 1, 0.0],
+        pscale=23.4,
+    ),
+):
+    """
+    Movie showing turbulence in 2D HW (nektar-driftwave).
+    """
+
+    # Set checkpoint dt from nektar params
+    nek_params = get_nektar_params(data_dir)
+    dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+
+    gen_movie(
+        "n",
+        data_dir=data_dir,
+        output_dir=output_dir,
+        dt=dt_chk,
+        output_fname=f"{output_basename}.avi",
+        animation_settings=animation_settings,
+        cbar_settings=dict(title="Δn"),
+        data_settings=dict(
+            # opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
+            range=[-max_val, max_val],
+            render_type="Surface",
+        ),
+        tlbl_settings=tlbl_settings,
+        view_settings=view_settings,
+        vtu_basename="square_quads_",
+        host=host,
+    )
+    avi_to_mp4(output_dir, output_basename)
+
+
 def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
     """
     Movie of ne in simplified LAPD sim, showing blob splitting.
