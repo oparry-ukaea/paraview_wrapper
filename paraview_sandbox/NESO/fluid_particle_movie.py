@@ -157,20 +157,24 @@ def gen_movie(
 
     # Color bar properties
     int_cbar_settings = dict(
+        label_fontsize=15,
         len=0.35,
         loc="Any Location",
         orient="Vertical",
-        pos=[0.92, 0.08],
+        pos=[0.93, 0.09],
+        title_fontsize=15,
         title=varname,
         vals=[],
     )
     int_cbar_settings.update(cbar_settings)
     cbar = GetScalarBar(color_tf, view)
     cbar.ComponentTitle = ""
+    cbar.LabelFontSize = int_cbar_settings["label_fontsize"]
     cbar.Orientation = int_cbar_settings["orient"]
     cbar.ScalarBarLength = int_cbar_settings["len"]
     cbar.WindowLocation = int_cbar_settings["loc"]
     cbar.Title = int_cbar_settings["title"]
+    cbar.TitleFontSize = int_cbar_settings["title_fontsize"]
     cbar.Position = int_cbar_settings["pos"]
     if int_cbar_settings["vals"]:
         cbar.UseCustomLabels = 1

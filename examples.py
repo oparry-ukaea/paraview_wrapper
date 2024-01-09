@@ -37,7 +37,9 @@ def driftwave_movie(
         dt=dt_chk,
         output_fname=f"{output_basename}.avi",
         animation_settings=animation_settings,
-        cbar_settings=dict(title="Δn"),
+        cbar_settings=dict(
+            title="Δn", label_fontsize=20, pos=[0.9, 0.06], title_fontsize=20
+        ),
         data_settings=dict(
             # opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
             range=[-max_val, max_val],
