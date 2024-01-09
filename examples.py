@@ -186,6 +186,7 @@ def hw3d_fluid_only_movie(
     output_dir=get_desktop_dir(),
     animation_settings=dict(FrameRate=20, FrameWindow=[1, 160], Quality=2),
     max_val=15.0,
+    tlbl_settings={},
     view_settings=dict(
         pos=[21.68, 9.41, 11.91],
         fpt=[0.0, 0.0, 5.0],
@@ -197,10 +198,16 @@ def hw3d_fluid_only_movie(
     Movie showing turbulence in fluid-only t4c3 sim (params optimised to boost turbulence).
     Given to WA, ET for demos at IAEA FEC.
     """
+
+    # Set checkpoint dt from nektar params
+    nek_params = get_nektar_params(data_dir)
+    dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+
     gen_movie(
         "ne",
         data_dir=data_dir,
         output_dir=output_dir,
+        dt=dt_chk,
         output_fname=f"{output_basename}.avi",
         animation_settings=animation_settings,
         cbar_settings=dict(title="Δn"),
@@ -208,6 +215,7 @@ def hw3d_fluid_only_movie(
             range=[-max_val, max_val],
             opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
         ),
+        tlbl_settings=tlbl_settings,
         view_settings=view_settings,
         vtu_basename="hw_",
         host=host,

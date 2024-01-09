@@ -3,6 +3,8 @@ import os.path
 from paraview.simple import *
 import re
 
+from .time_filter import add_time_filter
+
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
@@ -13,10 +15,12 @@ def gen_movie(
     output_dir,
     particle_fname="",
     particle_props={},
+    dt=None,
     vtu_basename="",
     animation_settings={},
     cbar_settings={},
     data_settings={},
+    tlbl_settings={},
     view_settings={},
     output_fname="",
     host="",
@@ -171,6 +175,10 @@ def gen_movie(
     if int_cbar_settings["vals"]:
         cbar.UseCustomLabels = 1
         cbar.CustomLabels = int_cbar_settings["vals"]
+
+    # Add a time label
+    if dt is not None:
+        add_time_filter(dt, vtu_data, view, tlbl_settings)
 
     # Display properties
     display.SetRepresentationType(int_data_settings["render_type"])
