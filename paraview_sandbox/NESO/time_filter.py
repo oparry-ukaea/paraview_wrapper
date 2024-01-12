@@ -10,7 +10,7 @@ def add_time_filter(dt, input_data, view, tlbl_settings={}):
         )
 
     # Position bottom right, use engineering format by default
-    tlbl_settings_int = dict(pos=[0.6, 0.1], fmt=".1E", fontsize=14)
+    tlbl_settings_int = dict(pos=[0.6, 0.1], fmt=".1E", fontsize=14, init_val=0.0)
     tlbl_settings_int.update(tlbl_settings)
 
     # Create an 'Annotate Time Filter'
@@ -20,6 +20,7 @@ def add_time_filter(dt, input_data, view, tlbl_settings={}):
 
     filter.Format = "Time: {time:" + tlbl_settings_int["fmt"] + "}"
     filter.Scale = dt
+    filter.Shift = tlbl_settings_int["init_val"]
 
     # Show data in view
     # Includes fudge to make this work for different data representations
