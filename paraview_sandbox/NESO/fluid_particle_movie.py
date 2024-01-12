@@ -4,6 +4,7 @@ from paraview.simple import *
 import re
 
 from .time_filter import add_time_filter
+from ..utils import gen_opacity_pts
 
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
@@ -240,21 +241,3 @@ def gen_movie(
     )
 
     print(f"Saved animation to {output_fpath}")
-
-
-def gen_opacity_pts(opacity_vals):
-    # Check types
-    try:
-        tmp_it1 = iter(opacity_vals)
-        tmp_it2 = iter(opacity_vals[0])
-        if len(opacity_vals[0]) != 2:
-            raise TypeError
-    except TypeError:
-        print("opacity_values must be a list of 2-tuples [(val1,op1),(val2,op2)...]")
-        raise
-
-    pts = []
-    for val_op in opacity_vals:
-        pts.extend(val_op)
-        pts.extend((0.5, 0.0))
-    return pts
