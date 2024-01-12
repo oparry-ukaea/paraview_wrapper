@@ -82,7 +82,14 @@ def ne_Ge_line_plot(
     # Read params from the Nektar session file
     delta = nek_params["delta"]
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
-    plot_settings = dict(xrange=[0.0, 2.0], yrange=[-1.2, 1.1 * (delta + 1 / delta)])
+    series_colors = {}
+    series_colors["ne Equilibrium"] = "g"
+    series_colors["Ge Equilibrium"] = "r"
+    plot_settings = dict(
+        xrange=[0.0, 2.0],
+        yrange=[-1.2, 1.1 * (delta + 1 / delta)],
+        colors=series_colors,
+    )
 
     tlbl_settings = {}
     # Add some expressions to the line plot
