@@ -12,7 +12,7 @@ def driftwave_movie(
     host="",
     output_basename="driftwave",
     output_dir=get_desktop_dir(),
-    animation_settings=dict(FrameRate=15, FrameWindow=[1, 100], Quality=2),
+    animation_settings=dict(FrameRate=15, FrameWindow=[1, 200], Quality=2),
     max_val=1.0,
     tlbl_settings=dict(pos=[0.02, 0.02], fontsize=32),
     view_settings=dict(
