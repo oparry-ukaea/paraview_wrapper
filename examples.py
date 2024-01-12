@@ -168,9 +168,11 @@ def t4c2_img(data_dir, output_dir=get_desktop_dir()):
     Image of 2D-coupled sim at the output time used in the t4c2 report.
     """
     gen_img(
-        data_dir=data_dir,
+        data_dir,
+        "rho",
+        39.0,
         output_dir=output_dir,
-        output_time=39.0,
+        part_data_fname="SimpleSOL_particle_trajectory.h5part",
     )
 
 
