@@ -234,6 +234,35 @@ def t4c3_movie_fluid_full(data_dir, host):
     hw3d_fluid_only_movie(data_dir, host=host, output_basename="t4c3_fluid-only_turb")
 
 
+def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
+    """
+    Images of a 3DHW sim used in the t4c4 report.
+    """
+    for output_time in [40.0, 80.0, 120.0, 160.0]:
+        gen_img(
+            data_dir,
+            "ne",
+            output_time,
+            fluid_props=dict(
+                cbar_pos=[0.03, 0.04],
+                cbar_orient="Vertical",
+                cbar_range=[-6, 6],
+                cbar_title=r"n$_e$$",
+                opacities=[(-6.0, 1.0), (0.0, 0.0), (6.0, 1.0)],
+                render_mode="Resample To Image",
+            ),
+            fluid_vtu_basename="hw",
+            fluid_view_settings=dict(
+                fpt=[0.0, 0.0, 5.0],
+                pos=[20.4, -7.7, -4.3],
+                pscale=6.12,
+                up=[-0.4, 0.090, -0.91],
+            ),
+            output_basename="t4c4_HW3D",
+            output_dir=output_dir,
+        )
+
+
 def hw3d_fluid_only_movie(
     data_dir,
     host="",

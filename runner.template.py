@@ -10,6 +10,7 @@ from examples import (
     t4c3_movie_coupled_zoomed_out,
     t4c3_movie_w_remote,
     t4c3_movie_zoomed_blob,
+    t4c4_HW3D_imgs,
 )
 
 
@@ -54,3 +55,7 @@ ne_Ge_line_plot(data_dir_1d, animation_settings=dict(FrameRate=5))
 # 1D line plot (SimpleSOL)
 data_dir_simple_sol = ""
 t4c2_1d_profs(data_dir_simple_sol)
+
+# Series of 3DHW images for t4c4
+t4c4_HW3D_path = ""
+t4c4_HW3D_imgs(t4c4_HW3D_path)
