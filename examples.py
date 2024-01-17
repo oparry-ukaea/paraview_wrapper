@@ -238,7 +238,7 @@ def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
     """
     Images of a 3DHW sim used in the t4c4 report.
     """
-    for output_time in [40.0, 80.0, 120.0, 160.0]:
+    for output_time in [0.0, 50.0, 100.0, 160.0]:
         gen_img(
             data_dir,
             "ne",
@@ -246,9 +246,9 @@ def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
             fluid_props=dict(
                 cbar_pos=[0.03, 0.04],
                 cbar_orient="Vertical",
-                cbar_range=[-6, 6],
-                cbar_title=r"n$_e$$",
-                opacities=[(-6.0, 1.0), (0.0, 0.0), (6.0, 1.0)],
+                cbar_range=[-12, 12],
+                cbar_title=r"n$_e$",
+                opacities=[(-12.0, 1.0), (0.0, 0.0), (12.0, 1.0)],
                 render_mode="Resample To Image",
             ),
             fluid_vtu_basename="hw",
