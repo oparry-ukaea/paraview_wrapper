@@ -53,9 +53,11 @@ def convert_str_dict(sd, d={}):
             pass
     if sd and len(d) > nd_in:
         for ks, vs in list(sd.items()):
+            tmp = vs
             for k, v in d.items():
-                if k in vs:
-                    sd[ks] = vs.replace(k, str(v))
+                if k in tmp:
+                    tmp = tmp.replace(k, str(v))
+            sd[ks] = tmp
         convert_str_dict(sd, d)
     for ks, vs in list(sd.items()):
         print(
