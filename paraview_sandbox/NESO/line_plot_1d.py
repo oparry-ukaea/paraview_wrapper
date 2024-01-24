@@ -20,6 +20,8 @@ def line_plot_1d(
     varnames,
     data_dir,
     output_dir,
+    pt1=[],
+    pt2=[],
     dt=None,
     vtu_basename="",
     animation_settings={},
@@ -28,6 +30,7 @@ def line_plot_1d(
     plot_settings={},
     tlbl_settings={},
     host="",
+    line_dim=0,
 ):
     var_str = "-".join(varnames)
     default_lbl = f"{var_str}_line_plot"
@@ -85,8 +88,17 @@ def line_plot_1d(
         tmp_display = Show(expr, data_view, "UnstructuredGridRepresentation")
         line_plot_inputs.append(expr)
 
+    # Defaults for line start,end
+    if not pt1:
+        pt1 = [0.0] * 3
+    if not pt2:
+        pt2 = [0.0] * 3
+        pt2[line_dim] = 2.0
+
     # Create line plot
     line_plot = PlotOverLine(registrationName="line_plot", Input=line_plot_inputs[-1])
+    line_plot.Point1 = pt1
+    line_plot.Point2 = pt2
 
     # set active source
     SetActiveSource(line_plot)

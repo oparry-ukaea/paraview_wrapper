@@ -75,6 +75,7 @@ def ne_Ge_line_plot(
     data_dir,
     output_dir=get_desktop_dir(),
     animation_settings={},
+    line_dim=0,
 ):
     nek_params = get_nektar_params(data_dir)
 
@@ -85,6 +86,7 @@ def ne_Ge_line_plot(
     series_colors["ne Equilibrium"] = "g"
     series_colors["Ge Equilibrium"] = "r"
     plot_settings = dict(
+        xlabel="z",
         xrange=[0.0, 2.0],
         yrange=[-1.2, 1.1 * (delta + 1 / delta)],
         colors=series_colors,
@@ -105,6 +107,7 @@ def ne_Ge_line_plot(
         ["ne", "Ge"],
         data_dir,
         output_dir,
+        line_dim=line_dim,
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
