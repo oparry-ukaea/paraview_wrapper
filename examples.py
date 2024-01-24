@@ -74,7 +74,6 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
 def ne_Ge_line_plot(
     data_dir,
     output_dir=get_desktop_dir(),
-    output_fname="",
     animation_settings={},
 ):
     nek_params = get_nektar_params(data_dir)
@@ -90,6 +89,7 @@ def ne_Ge_line_plot(
         yrange=[-1.2, 1.1 * (delta + 1 / delta)],
         colors=series_colors,
     )
+    output_basename = f"1Din{line_dim+1}DDoutflow_delta{delta}_ne-Ge_profs"
 
     tlbl_settings = {}
     # Add some expressions to the line plot
@@ -108,7 +108,7 @@ def ne_Ge_line_plot(
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
-        output_fname=output_fname,
+        output_basename=output_basename,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
     )
@@ -116,7 +116,7 @@ def ne_Ge_line_plot(
 
 def t4c2_1d_profs(
     data_dir,
-    output_fname="t4c2_1dprofs.avi",
+    output_basename="t4c2_1dprofs",
     output_dir=get_desktop_dir(),
     animation_settings={},
 ):
@@ -157,7 +157,7 @@ def t4c2_1d_profs(
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
-        output_fname=output_fname,
+        output_basename=output_basename,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
     )

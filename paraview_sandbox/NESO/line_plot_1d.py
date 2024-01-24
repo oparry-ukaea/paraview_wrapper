@@ -24,22 +24,22 @@ def line_plot_1d(
     vtu_basename="",
     animation_settings={},
     exprs_to_plot=[],
-    output_fname="",
+    output_basename="",
     plot_settings={},
     tlbl_settings={},
     host="",
 ):
     var_str = "-".join(varnames)
     default_lbl = f"{var_str}_line_plot"
-    if not output_fname:
-        output_fname = f"{default_lbl}.avi"
+    if not output_basename:
+        output_basename = default_lbl
 
     # Ensure expressions are all instances instances of PyExpr
     for expr in exprs_to_plot:
         assert isinstance(expr, PyExpr)
 
     # Output path
-    output_fpath = os.path.join(output_dir, output_fname)
+    output_fpath = os.path.join(output_dir, output_basename + ".avi")
 
     # Fluid vtus
     if host:
