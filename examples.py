@@ -90,6 +90,7 @@ def ne_Ge_line_plot(
         xrange=[0.0, 2.0],
         yrange=[-1.2, 1.1 * (delta + 1 / delta)],
         colors=series_colors,
+        legend_pos=[260, 80],
     )
     output_basename = f"1Din{line_dim+1}DDoutflow_delta{delta}_ne-Ge_profs"
 

@@ -111,6 +111,8 @@ def line_plot_1d(
     # ylabel=" or ".join(varnames)
     # Apply settings
     int_plot_settings = dict(
+        legend_loc="TopRight",
+        legend_pos=[],
         xlabel="x",
         ylabel="",
         xrange=[0.0, 2.0],
@@ -164,6 +166,11 @@ def line_plot_1d(
     view.LeftAxisTitleBold = 0
     view.LeftAxisTitleFontSize = int_plot_settings["font_size"]
     view.LeftAxisUseCustomRange = 1
+    if int_plot_settings["legend_pos"]:
+        view.LegendLocation = "Custom"
+        view.LegendPosition = int_plot_settings["legend_pos"]
+    else:
+        view.LegendLocation = int_plot_settings["legend_loc"]
 
     if dt is not None:
         add_time_filter(dt, vtu_data, view, tlbl_settings)
