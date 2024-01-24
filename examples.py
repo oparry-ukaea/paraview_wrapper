@@ -132,6 +132,7 @@ def ne_Ge_line_plot(
         tlbl_settings=tlbl_settings,
         vtu_basename="outflow1d",
     )
+    avi_to_mp4(output_dir, output_basename)
 
 
 def t4c2_1d_profs(
