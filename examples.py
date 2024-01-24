@@ -73,6 +73,7 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
 
 def ne_Ge_line_plot(
     data_dir,
+    host="",
     output_dir=get_desktop_dir(),
     animation_settings={},
     line_dim=0,
@@ -108,6 +109,7 @@ def ne_Ge_line_plot(
         ["ne", "Ge"],
         data_dir,
         output_dir,
+        host=host,
         line_dim=line_dim,
         dt=dt_chk,
         animation_settings=animation_settings,
@@ -115,6 +117,7 @@ def ne_Ge_line_plot(
         output_basename=output_basename,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
+        vtu_basename="outflow1d",
     )
 
 
