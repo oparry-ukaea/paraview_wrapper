@@ -14,7 +14,6 @@ from paraview.simple import (
     H5PartReader,
     SaveScreenshot,
     Show,
-    XMLUnstructuredGridReader,
 )
 
 from ..utils import gen_opacity_pts
@@ -89,14 +88,8 @@ def gen_img(
     # -------------------------------------------------------------------------
 
     # Read all Nektar vtus
-    fluid_vtu_fpaths = glob(f"{data_dir}/{fluid_vtu_basename}*.vtu")
-    pattern = re.compile(r".*_([0-9]*).vtu")
-    fluid_vtu_fpaths = sorted(
-        fluid_vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0])
-    )
-    fluid_data = XMLUnstructuredGridReader(
-        registrationName="2DWithParticles_config_*", FileName=fluid_vtu_fpaths
-    )
+    fluid_data = get_vtu_data(data_dir, vtu_basename=fluid_vtu_basename)
+
     # Read particle data
     if plotting_particles:
         part_data = H5PartReader(

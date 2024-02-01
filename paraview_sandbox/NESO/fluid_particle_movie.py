@@ -4,7 +4,7 @@ from paraview.simple import *
 import re
 
 from .time_filter import add_time_filter
-from ..utils import gen_opacity_pts
+from ..utils import gen_opacity_pts, get_vtu_data
 
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
@@ -32,26 +32,10 @@ def gen_movie(
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
 
-    # Fluid vtus
     if host:
         Connect(host)
-        if vtu_basename and "FrameWindow" in animation_settings:
-            fw = animation_settings["FrameWindow"]
-            vtu_fpaths = [f"{data_dir}/{vtu_basename}{n}.vtu" for n in range(*fw)]
-        else:
-            raise RuntimeError(
-                "Must specify vtu_basename and animation_settings['FrameWindow'] when using remote host"
-            )
-    else:
-        vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
-        pattern = re.compile(r".*_([0-9]*).vtu")
-        vtu_fpaths = sorted(
-            vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0])
-        )
 
-    vtu_data = XMLUnstructuredGridReader(
-        registrationName="vtu_data", FileName=vtu_fpaths
-    )
+    vtu_data = get_vtu_data(data_dir, vtu_basename=vtu_basename)
 
     # get animation scene
     anim_scene = GetAnimationScene()
@@ -223,7 +207,7 @@ def gen_movie(
     int_animation_settings.update(animation_settings)
 
     if "FrameWindow" in int_animation_settings:
-        nframes_max = len(vtu_fpaths)
+        nframes_max = len(vtu_data.FileName)
         fw = int_animation_settings["FrameWindow"]
         fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
 
