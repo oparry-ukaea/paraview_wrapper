@@ -73,50 +73,71 @@ def lapd_ne_blob_split(data_dir, output_dir=get_desktop_dir()):
 
 def ne_Ge_line_plot(
     data_dir,
+    host="",
     output_dir=get_desktop_dir(),
-    output_fname="",
     animation_settings={},
+    line_dim=0,
 ):
     nek_params = get_nektar_params(data_dir)
 
     # Read params from the Nektar session file
     delta = nek_params["delta"]
+    T = nek_params.get("T", 1.0)
+    nstar = nek_params.get("nstar", 1.0)
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
     series_colors = {}
     series_colors["ne Equilibrium"] = "g"
     series_colors["Ge Equilibrium"] = "r"
     plot_settings = dict(
+        xlabel="z",
         xrange=[0.0, 2.0],
         yrange=[-1.2, 1.1 * (delta + 1 / delta)],
         colors=series_colors,
+        legend_pos=[260, 80],
     )
+    output_basename = f"1Din{line_dim+1}DDoutflow_delta{delta}_ne-Ge_profs"
 
     tlbl_settings = {}
     # Add some expressions to the line plot
+    nstar_rootT = f"{nstar}*sqrt({T})"
+    z_str = f"(inputs[0].Points[:,{line_dim}]-1)"
+    c_str = f"{nstar_rootT}*({delta}+1/{delta})"
+    R_str = f"{nstar_rootT}*sqrt({delta}**2+1/{delta}**2+2-4*{z_str}**2)"
+    ne_str = f"({c_str}+{R_str})/2/{T}"
+    # u_str = f"({c_str}-{R_str})/2/{nstar}/{z_str}"
+    # Ge_str = f"({ne_str})*({u_str})"
+    Ge_str = f"({nstar})*({z_str})"
     exprs_to_plot = [
         PyExpr(
             "ne Equilibrium",
-            f"0.5*(({delta}+1/{delta})+sqrt(({delta}+1/{delta})**2-4*(inputs[0].Points[:,0]-1)**2))",
+            ne_str,
         ),
-        PyExpr("Ge Equilibrium", "inputs[0].Points[:,0]-1"),
+        PyExpr(
+            "Ge Equilibrium",
+            Ge_str,
+        ),
     ]
 
     line_plot_1d(
         ["ne", "Ge"],
         data_dir,
         output_dir,
+        host=host,
+        line_dim=line_dim,
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
-        output_fname=output_fname,
+        output_basename=output_basename,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
+        vtu_basename="outflow1d",
     )
+    avi_to_mp4(output_dir, output_basename)
 
 
 def t4c2_1d_profs(
     data_dir,
-    output_fname="t4c2_1dprofs.avi",
+    output_basename="t4c2_1dprofs",
     output_dir=get_desktop_dir(),
     animation_settings={},
 ):
@@ -157,7 +178,7 @@ def t4c2_1d_profs(
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
-        output_fname=output_fname,
+        output_basename=output_basename,
         plot_settings=plot_settings,
         tlbl_settings=tlbl_settings,
     )
