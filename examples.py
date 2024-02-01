@@ -176,6 +176,7 @@ def t4c2_1d_profs(
         data_dir,
         output_dir,
         dt=dt_chk,
+        pt2=[110.0, 0.0, 0.0],
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
         output_basename=output_basename,
