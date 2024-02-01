@@ -1,10 +1,9 @@
-from glob import glob
 import os.path
 from paraview.simple import *
 import re
 
 from .time_filter import add_time_filter
-from ..utils import get_color_array
+from ..utils import get_color_array, get_vtu_data
 
 ### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
@@ -44,26 +43,7 @@ def line_plot_1d(
     # Output path
     output_fpath = os.path.join(output_dir, output_basename + ".avi")
 
-    # Fluid vtus
-    if host:
-        Connect(host)
-        if vtu_basename and "FrameWindow" in animation_settings:
-            fw = animation_settings["FrameWindow"]
-            vtu_fpaths = [f"{data_dir}/{vtu_basename}{n}.vtu" for n in range(*fw)]
-        else:
-            raise RuntimeError(
-                "Must specify vtu_basename and animation_settings['FrameWindow'] when using remote host"
-            )
-    else:
-        vtu_fpaths = glob(f"{data_dir}/{vtu_basename}*.vtu")
-        pattern = re.compile(r".*_([0-9]*).vtu")
-        vtu_fpaths = sorted(
-            vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0])
-        )
-
-    vtu_data = XMLUnstructuredGridReader(
-        registrationName="vtu_data", FileName=vtu_fpaths
-    )
+    vtu_data = get_vtu_data(data_dir, vtu_basename=vtu_basename)
 
     # get animation scene
     anim_scene = GetAnimationScene()
@@ -135,16 +115,24 @@ def line_plot_1d(
     lstys = display.SeriesLineStyle.GetData()
     lstys_to_add = []
     for expr in exprs_to_plot:
-        lsty_idx = lstys.index(expr.name)
-        if lsty_idx >= 0:
+        try:
+            lsty_idx = lstys.index(expr.name)
+            lsty_defined = lsty_idx >= 0
+        except:
+            lsty_defined = False
+        if lsty_defined:
             lstys[lsty_idx + 1] = str(int_plot_settings["lstys"].get(expr.name, 2))
         else:
             lstys_to_add.extend([expr.name, "2"])
-        col_idx = cols.index(expr.name)
+        try:
+            col_idx = cols.index(expr.name)
+            col_defined = col_idx >= 0
+        except:
+            col_defined = False
         col_arr = get_color_array(
             expr.name, int_plot_settings["colors"].get(expr.name, "r")
         )
-        if col_idx >= 0:
+        if col_defined:
             for ii, el in enumerate(col_arr):
                 cols[col_idx + ii] = el
         else:
