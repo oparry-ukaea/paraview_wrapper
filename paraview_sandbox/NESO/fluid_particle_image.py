@@ -16,7 +16,7 @@ from paraview.simple import (
     Show,
 )
 
-from ..utils import gen_opacity_pts
+from ..utils import gen_opacity_pts, get_vtu_data
 
 
 def get_data_dim(vtu_data):
