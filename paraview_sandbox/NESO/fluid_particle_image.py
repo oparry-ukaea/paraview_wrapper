@@ -16,25 +16,7 @@ from paraview.simple import (
     Show,
 )
 
-from ..utils import gen_opacity_pts, get_data_dim, get_vtu_data
-
-
-def gen_cbar_props(user_settings, **defaults):
-    # Common defaults
-    props = dict(
-        cbar_label_fontsize=15,
-        cbar_len=0.35,
-        cbar_loc="Any Location",
-        cbar_orient="Horizontal",
-        cbar_pos=[0.3, 0.68],
-        cbar_title_fontsize=18,
-        cbar_title="No title set",
-        cbar_use_log=0,
-        cbar_vals=[],
-    )
-    props.update(**defaults)
-    props.update(**user_settings)
-    return props
+from ..utils import gen_cbar_props, gen_opacity_pts, get_data_dim, get_vtu_data
 
 
 def gen_img(
