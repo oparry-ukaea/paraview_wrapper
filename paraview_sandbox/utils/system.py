@@ -7,6 +7,10 @@ import paraview.util
 import re
 import sys
 
+def gen_registration_name(prefix):
+    return prefix + datetime.datetime.now().strftime(
+            "%Y-%m-%d-%H-%M-%S-%f"
+        )
 
 def get_desktop_dir():
     loc = ""
@@ -17,7 +21,6 @@ def get_desktop_dir():
     else:
         raise (RuntimeError("get_desktop_dir: Desktop dir not found"))
 
-
 def get_vtu_data(
     data_dir,
     vtu_basename="",
@@ -25,9 +28,7 @@ def get_vtu_data(
 ):
     # Default registration name
     if registration_name is None:
-        registration_name = "vtu_data" + datetime.datetime.now().strftime(
-            "%Y-%m-%d-%H-%M-%S-%f"
-        )
+        registration_name = gen_registration_name("vtu_data")
 
     glob_pattern = f"{data_dir}/{vtu_basename}*.vtu"
     vtu_fpaths = paraview.util.Glob(path=glob_pattern)
