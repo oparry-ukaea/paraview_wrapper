@@ -16,15 +16,7 @@ from paraview.simple import (
     Show,
 )
 
-from ..utils import gen_opacity_pts, get_vtu_data
-
-
-def get_data_dim(vtu_data):
-    info = vtu_data.GetDataInformation()
-    bounds = info.GetBounds()
-    for idim in [3, 2, 1]:
-        if bounds[2 * idim - 1] > bounds[2 * idim - 2]:
-            return idim
+from ..utils import gen_opacity_pts, get_data_dim, get_vtu_data
 
 
 def gen_cbar_props(user_settings, **defaults):

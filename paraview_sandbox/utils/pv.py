@@ -1,3 +1,11 @@
+def get_data_dim(vtu_data):
+    info = vtu_data.GetDataInformation()
+    bounds = info.GetBounds()
+    for idim in [3, 2, 1]:
+        if bounds[2 * idim - 1] > bounds[2 * idim - 2]:
+            return idim
+
+
 def gen_opacity_pts(opacity_vals):
     # Check types
     try:
