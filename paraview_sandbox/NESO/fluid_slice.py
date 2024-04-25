@@ -14,11 +14,12 @@ from paraview.simple import (
     GetScalarBar,
     H5PartReader,
     Hide,
+    SaveAnimation,
     SaveScreenshot,
     Show,
     Slice,
 )
-
+from .time_filter import add_time_filter
 from ..utils import (
     gen_cbar_props,
     gen_opacity_pts,
@@ -32,6 +33,8 @@ def fluid_slice(
     data_dir,
     fluid_var,
     output_time=None,
+    dt=None,
+    animation_settings={},
     fluid_vtu_basename="",
     fluid_props={},
     host="",
@@ -42,6 +45,7 @@ def fluid_slice(
     #     part_props={},
     #     part_view_settings={},
     slice_settings={},
+    tlbl_settings={},
 ):
     if output_basename is None:
         output_basename = fluid_vtu_basename
@@ -56,6 +60,7 @@ def fluid_slice(
     )
     int_fluid_view_settings.update(fluid_view_settings)
     int_view_settings = [int_fluid_view_settings]
+
     # if plotting_particles:
     #     int_part_view_settings = dict(
     #         fpt=[2.75, 0.20755, 0.0],
@@ -65,15 +70,6 @@ def fluid_slice(
     #     )
     #     int_part_view_settings.update(part_view_settings)
     #     int_view_settings.append(int_part_view_settings)
-
-    # Output path
-    if output_time is None:
-        t_string = ""
-    else:
-        t_string = f"_t{str(output_time)}"
-    output_fpath = os.path.join(
-        output_dir, f"{output_basename}_{fluid_var}{t_string}.png"
-    )
 
     if host:
         Connect(host)
@@ -158,11 +154,8 @@ def fluid_slice(
         view.OrientationAxesVisibility = 0
         view.AxesGrid.Visibility = 1
 
-    # Choose animation frame
     animation_scene = GetAnimationScene()
     animation_scene.UpdateAnimationUsingDataTimeSteps()
-    if output_time is not None:
-        animation_scene.AnimationTime = output_time
 
     # Colour fluid by density, set scale, setup colorbar
     int_fluid_props = gen_cbar_props(
@@ -236,6 +229,12 @@ def fluid_slice(
     #     if int_fluid_props["render_type"] == "Volume":
     #         fluid_Display.SelectMapper = int_fluid_props["render_mode"]
 
+    # Add a time label
+    int_tlbl_settings = {}
+    int_tlbl_settings.update(tlbl_settings)
+    if dt is not None:
+        add_time_filter(dt, fluid_data, view, int_tlbl_settings)
+
     # ------------------------------------------------------------------------------
     # Generate screenshot
     layout.SetSize(1132, 816)
@@ -248,4 +247,29 @@ def fluid_slice(
         view.CameraParallelScale = settings["pscale"]
         view.CameraViewUp = settings["up"]
 
-    SaveScreenshot(output_fpath, layout)
+    if output_time is None:
+        # Default animation settings
+        int_animation_settings = dict(ImageResolution=[1920, 1080], FrameRate=10)
+        # Apply any animation settings passed by the user
+        int_animation_settings.update(animation_settings)
+
+        if "FrameWindow" in int_animation_settings:
+            nframes_max = len(fluid_data.FileName)
+            fw = int_animation_settings["FrameWindow"]
+            fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
+            int_animation_settings["FrameWindow"] = fw
+
+        output_fpath = os.path.join(output_dir, f"{output_basename}_{fluid_var}.avi")
+        SaveAnimation(
+            output_fpath,
+            view,
+            **int_animation_settings,
+        )
+    else:
+        t_string = f"_t{str(output_time)}"
+        output_fpath = os.path.join(
+            output_dir, f"{output_basename}_{fluid_var}{t_string}.png"
+        )
+        # Choose animation frame
+        animation_scene.AnimationTime = output_time
+        SaveScreenshot(output_fpath, layout)

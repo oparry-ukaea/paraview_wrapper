@@ -414,6 +414,12 @@ def hw2d_comp_slice(
     if var in max_vals:
         fluid_props["cbar_range"] = [-max_vals[var], max_vals[var]]
 
+    # Compute dt if no single chk file specified (i.e. for animations)
+    dt_chk = None
+    if chk_num is None:
+        # Set checkpoint dt from nektar params
+        nek_params = get_nektar_params(data_dir)
+        dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
     # # Set checkpoint dt from nektar params
     # nek_params = get_nektar_params(data_dir)
     # dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
@@ -421,6 +427,8 @@ def hw2d_comp_slice(
     fluid_slice(
         data_dir,
         var,
+        dt=dt_chk,
+        animation_settings=animation_settings,
         output_time=chk_num,
         host=host,
         output_basename=output_basename,
@@ -428,6 +436,7 @@ def hw2d_comp_slice(
         slice_settings={},
         fluid_props=fluid_props,
         fluid_view_settings=fluid_view_settings,
+        tlbl_settings=tlbl_settings,
     )
 
 
