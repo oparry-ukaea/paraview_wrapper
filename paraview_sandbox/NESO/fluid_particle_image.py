@@ -185,3 +185,4 @@ def gen_img(
         view.CameraViewUp = settings["up"]
 
     SaveScreenshot(output_fpath, layout)
+    print(f"Saved image to {output_fpath}")
