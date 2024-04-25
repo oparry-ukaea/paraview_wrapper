@@ -7,6 +7,28 @@ from paraview_sandbox.utils import (
 )
 
 
+def driftwave_movie3D(data_dir, outfname_suffix="", **kwargs):
+    view_settings = kwargs.pop(
+        "view_settings",
+        dict(
+            pos=[13.0, -0.376, -115.2],
+            fpt=[0.0, 0.0, 0.0],
+            up=[-0.23, 0.97, -0.03],
+            pscale=30.0,
+        ),
+    )
+    driftwave_movie(
+        data_dir,
+        animation_settings=dict(FrameRate=10, FrameWindow=[1, 200], Quality=2),
+        render_type="Volume",
+        view_settings=view_settings,
+        output_basename=f"driftwave3D{outfname_suffix}",
+        tlbl_settings=dict(pos=[0.02, 0.02], fontsize=32),
+        vtu_basename="driftwave_",
+        **kwargs,
+    )
+
+
 def driftwave_movie(
     data_dir,
     host="",
@@ -21,6 +43,8 @@ def driftwave_movie(
         up=[0.0, 1, 0.0],
         pscale=23.4,
     ),
+    render_type="Surface",
+    vtu_basename="square_quads_",
 ):
     """
     Movie showing turbulence in 2D HW (nektar-driftwave).
@@ -41,13 +65,13 @@ def driftwave_movie(
             title="Δn", label_fontsize=20, pos=[0.9, 0.06], title_fontsize=20
         ),
         data_settings=dict(
-            # opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
+            opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
             range=[-max_val, max_val],
-            render_type="Surface",
+            render_type=render_type,
         ),
         tlbl_settings=tlbl_settings,
         view_settings=view_settings,
-        vtu_basename="square_quads_",
+        vtu_basename=vtu_basename,
         host=host,
     )
     avi_to_mp4(output_dir, output_basename)
