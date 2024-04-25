@@ -289,6 +289,7 @@ def hw3d_fluid_only_movie(
     data_dir,
     var="ne",
     host="",
+    convert_to_mp4=False,
     output_basename="3DHW",
     output_dir=get_desktop_dir(),
     animation_settings=dict(FrameRate=20, FrameWindow=[1, 160], Quality=2),
@@ -327,7 +328,8 @@ def hw3d_fluid_only_movie(
         vtu_basename="hw_",
         host=host,
     )
-    avi_to_mp4(output_dir, output_basename)
+    if convert_to_mp4:
+        avi_to_mp4(output_dir, output_basename)
 
 
 def t4c3_movie_w_remote(data_dir, host, output_dir=get_desktop_dir()):
