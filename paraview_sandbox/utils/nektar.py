@@ -1,9 +1,11 @@
 """
 Stripped-down Nektar utils to avoid having to import (e.g.) NekPlot
 """
+
 import xml.etree.ElementTree as ET
 import os.path
 from glob import glob
+import math
 
 
 def is_nektar_config(path):
@@ -44,13 +46,21 @@ def convert_str_dict(sd, d={}):
     Handle param references by calling recursively.
     """
     nd_in = len(d)
+    ops = {"sqrt(": "math.sqrt("}
+
+    # Any purely numeric strings can be converted straight away
     for k in list(sd.keys()):
+        for op_k, op_v in ops.items():
+            if op_v not in sd[k] and op_k in sd[k]:
+                sd[k] = sd[k].replace(op_k, op_v)
         try:
             val = eval(sd[k])
             discard = sd.pop(k)
             d[k] = val
         except:
             pass
+    # If entries have been added to d (new numeric values are available)
+    # and there are still strings to be processed; try subbing in values, then call convert again
     if sd and len(d) > nd_in:
         for ks, vs in list(sd.items()):
             tmp = vs
