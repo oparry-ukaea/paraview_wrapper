@@ -287,6 +287,7 @@ def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
 
 def hw3d_fluid_only_movie(
     data_dir,
+    var="ne",
     host="",
     output_basename="3DHW",
     output_dir=get_desktop_dir(),
@@ -310,7 +311,7 @@ def hw3d_fluid_only_movie(
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
 
     gen_movie(
-        "ne",
+        var,
         data_dir=data_dir,
         output_dir=output_dir,
         dt=dt_chk,
