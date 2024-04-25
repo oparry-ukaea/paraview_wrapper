@@ -19,6 +19,8 @@ def add_time_filter(dt, input_data, view, tlbl_settings={}):
     )
 
     filter.Format = "Time: {time:" + tlbl_settings_int["fmt"] + "}"
+    if "unit" in tlbl_settings_int:
+        filter.Format += " " + tlbl_settings_int["unit"]
     filter.Scale = dt
     filter.Shift = tlbl_settings_int["init_val"]
 

@@ -420,9 +420,9 @@ def hw2d_comp_slice(
         # Set checkpoint dt from nektar params
         nek_params = get_nektar_params(data_dir)
         dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
-    # # Set checkpoint dt from nektar params
-    # nek_params = get_nektar_params(data_dir)
-    # dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+        unit = tlbl_settings.get("unit", "")
+        if unit == "us":
+            dt_chk /= nek_params["omega_ci"] * 1e-6
 
     fluid_slice(
         data_dir,
