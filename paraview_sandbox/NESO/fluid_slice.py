@@ -32,6 +32,7 @@ from ..utils import (
 def fluid_slice(
     data_dir,
     fluid_var,
+    coord_scale=None,
     output_time=None,
     dt=None,
     animation_settings={},
@@ -148,6 +149,11 @@ def fluid_slice(
     sliceDisplay.PolarAxes = "PolarAxesRepresentation"
     sliceDisplay.SelectInputVectors = [None, ""]
     sliceDisplay.WriteLog = ""
+    sliceDisplay.Triangulate = 0
+
+    if coord_scale is not None:
+        sliceDisplay.Scale = [coord_scale] * 3
+        sliceDisplay.DataAxesGrid.Scale = [coord_scale] * 3
 
     # Common settings for all views
     for view in views:
@@ -249,7 +255,7 @@ def fluid_slice(
 
     if output_time is None:
         # Default animation settings
-        int_animation_settings = dict(ImageResolution=[1920, 1080], FrameRate=10)
+        int_animation_settings = dict(FrameRate=20)
         # Apply any animation settings passed by the user
         int_animation_settings.update(animation_settings)
 
