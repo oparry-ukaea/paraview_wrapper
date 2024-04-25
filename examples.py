@@ -311,6 +311,9 @@ def hw3d_fluid_only_movie(
     nek_params = get_nektar_params(data_dir)
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
 
+    def_cbar_settings = dict(ne=dict(title="Δn"), phi=dict(title="Phi"))
+    cbar_settings = def_cbar_settings[var]
+
     gen_movie(
         var,
         data_dir=data_dir,
@@ -318,7 +321,7 @@ def hw3d_fluid_only_movie(
         dt=dt_chk,
         output_fname=f"{output_basename}.avi",
         animation_settings=animation_settings,
-        cbar_settings=dict(title="Δn"),
+        cbar_settings=cbar_settings,
         data_settings=dict(
             range=[-max_val, max_val],
             opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
@@ -401,7 +404,7 @@ def hw2d_comp_slice(
     host="",
     output_basename="",
     output_dir=get_desktop_dir(),
-    animation_settings=dict(FrameRate=20, FrameWindow=[1, 100], Quality=2),
+    animation_settings=dict(FrameRate=20),
     tlbl_settings={},
     fluid_view_settings=dict(
         pos=[8.15e-3, 8.15e-3, 5.043335426733482],
@@ -411,11 +414,15 @@ def hw2d_comp_slice(
         show_axes_grid=1,
         show_orient_axes=0,
     ),
+    slice_settings=dict(origin=[0, 0, 5.0]),
+    max_val=None,
 ):
-    max_vals = dict(ne=2e-11, w=0.2, phi=5e-8)
-    fluid_props = dict(cbar_orient="Vertical", cbar_pos=[0.05, 0.05])
-    if var in max_vals:
-        fluid_props["cbar_range"] = [-max_vals[var], max_vals[var]]
+    fluid_props = dict(cbar_orient="Vertical", cbar_pos=[0.12, 0.15])
+    if max_val is None:
+        max_vals = dict(ne=3.1, w=0.2, phi=5e-8)
+        max_vals.get(var, 1.0)
+        max_val = max_vals[var]
+    fluid_props["cbar_range"] = [-max_val, max_val]
 
     # Compute dt if no single chk file specified (i.e. for animations)
     dt_chk = None
@@ -436,7 +443,7 @@ def hw2d_comp_slice(
         host=host,
         output_basename=output_basename,
         output_dir=output_dir,
-        slice_settings={},
+        slice_settings=slice_settings,
         fluid_props=fluid_props,
         fluid_view_settings=fluid_view_settings,
         tlbl_settings=tlbl_settings,
