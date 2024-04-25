@@ -1,13 +1,27 @@
 from glob import glob
 import os.path
-from paraview.simple import *
+from paraview.simple import (
+    _DisableFirstRenderCameraReset,
+    ColorBy,
+    Connect,
+    FindViewOrCreate,
+    GetAnimationScene,
+    GetColorTransferFunction,
+    GetLayout,
+    GetOpacityTransferFunction,
+    GetScalarBar,
+    H5PartReader,
+    SaveAnimation,
+    SetActiveSource,
+    Show,
+)
 import re
 
 from .time_filter import add_time_filter
-from ..utils import gen_opacity_pts, get_vtu_data
+from ..utils import data_file_exists, gen_opacity_pts, get_vtu_data
 
 #### disable automatic camera reset on 'Show'
-paraview.simple._DisableFirstRenderCameraReset()
+_DisableFirstRenderCameraReset()
 
 
 def gen_movie(
@@ -54,39 +68,45 @@ def gen_movie(
 
     # Particle data
     if particle_fname:
-        int_particle_props = dict(
-            colorby="COMPUTATIONAL_WEIGHT",
-            cbar_len=0.25,
-            cbar_title="Particle Weight",
-            cbar_pos=[0.05, 0.9],
-            cbar_vals=[1e14 * x for x in [0, 0.5, 1, 1.5, 2, 2.5]],
-            psize=2,
-        )
-        int_particle_props.update(particle_props)
-        particle_fpath = os.path.join(data_dir, particle_fname)
-        part_data = H5PartReader(
-            registrationName=particle_fname,
-            FileName=particle_fpath,
-        )
-        part_display = Show(part_data, view, "GeometryRepresentation")
-        ColorBy(part_display, ("POINTS", int_particle_props["colorby"]))
-        part_color_tf = GetColorTransferFunction(int_particle_props["colorby"])
+        if data_file_exists(data_dir, particle_fname):
+            int_particle_props = dict(
+                colorby="COMPUTATIONAL_WEIGHT",
+                cbar_len=0.25,
+                cbar_title="Particle Weight",
+                cbar_pos=[0.05, 0.9],
+                cbar_vals=[1e14 * x for x in [0, 0.5, 1, 1.5, 2, 2.5]],
+                orient="Horizontal",
+                psize=2,
+            )
+            int_particle_props.update(particle_props)
+            particle_fpath = os.path.join(data_dir, particle_fname)
+            part_data = H5PartReader(
+                registrationName=particle_fname,
+                FileName=particle_fpath,
+            )
+            part_display = Show(part_data, view, "GeometryRepresentation")
+            ColorBy(part_display, ("POINTS", int_particle_props["colorby"]))
+            part_color_tf = GetColorTransferFunction(int_particle_props["colorby"])
 
-        part_color_tf.RescaleTransferFunction(
-            int_particle_props["cbar_vals"][0], int_particle_props["cbar_vals"][-1]
-        )
+            part_color_tf.RescaleTransferFunction(
+                int_particle_props["cbar_vals"][0], int_particle_props["cbar_vals"][-1]
+            )
 
-        part_display.PointSize = int_particle_props["psize"]
+            part_display.PointSize = int_particle_props["psize"]
+            if int_particle_props["plot_spheres"]:
+                part_display.RenderPointsAsSpheres = 1
 
-        part_cbar = GetScalarBar(part_color_tf, view)
-        part_cbar.ComponentTitle = ""
-        part_cbar.Orientation = "Horizontal"
-        part_cbar.ScalarBarLength = int_particle_props["cbar_len"]
-        part_cbar.WindowLocation = "Any Location"
-        part_cbar.Title = int_particle_props["cbar_title"]
-        part_cbar.Position = int_particle_props["cbar_pos"]
-        part_cbar.UseCustomLabels = 1
-        part_cbar.CustomLabels = int_particle_props["cbar_vals"]
+            part_cbar = GetScalarBar(part_color_tf, view)
+            part_cbar.ComponentTitle = ""
+            part_cbar.Orientation = int_particle_props["orient"]
+            part_cbar.ScalarBarLength = int_particle_props["cbar_len"]
+            part_cbar.WindowLocation = "Any Location"
+            part_cbar.Title = int_particle_props["cbar_title"]
+            part_cbar.Position = int_particle_props["cbar_pos"]
+            part_cbar.UseCustomLabels = 1
+            part_cbar.CustomLabels = int_particle_props["cbar_vals"]
+        else:
+            print(f"No particle data at {data_dir}/{particle_fname}, skipping")
 
     # init the 'PiecewiseFunction' selected for 'ScaleTransferFunction'
     display.ScaleTransferFunction.Points = [

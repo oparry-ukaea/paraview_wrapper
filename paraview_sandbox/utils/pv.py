@@ -60,6 +60,12 @@ def _extract_basename(p, nektar_fname_fmt=False):
         return os.path.basename(p)
 
 
+def data_file_exists(data_dir, fname):
+    glob_pattern = f"{data_dir}/{fname}"
+    tmp = paraview.util.Glob(path=glob_pattern)
+    return len(tmp) >= 1
+
+
 def get_vtu_data(
     data_dir,
     vtu_basename="",
