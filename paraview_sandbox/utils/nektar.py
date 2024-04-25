@@ -91,4 +91,4 @@ def get_nektar_params(dir, fname=""):
     root = tree.getroot()
     params = root.find("./CONDITIONS/PARAMETERS")
     str_dict = {t[0].strip(): t[1].strip() for t in [p.text.split("=") for p in params]}
-    return convert_str_dict(str_dict)
+    return convert_str_dict(str_dict, d={})
