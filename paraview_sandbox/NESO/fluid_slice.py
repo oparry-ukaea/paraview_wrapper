@@ -76,7 +76,7 @@ def fluid_slice(
         Connect(host)
 
     # Read all Nektar vtus
-    fluid_data = get_vtu_data(data_dir, vtu_basename=fluid_vtu_basename)
+    fluid_data = get_vtu_data(data_dir, basename=fluid_vtu_basename)
 
     # # Read particle data
     # if plotting_particles:

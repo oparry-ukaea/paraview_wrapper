@@ -1,6 +1,9 @@
 import datetime
 import os.path
-from paraview.simple import XMLUnstructuredGridReader
+from paraview.simple import (
+    XMLUnstructuredGridReader,
+    XMLPartitionedUnstructuredGridReader,
+)
 import paraview.util
 import re
 
@@ -66,9 +69,17 @@ def data_file_exists(data_dir, fname):
     return len(tmp) >= 1
 
 
+def get_paths(data_dir, basename, ext):
+    pattern = f"{data_dir}/{basename}*.{ext}"
+    fpaths = paraview.util.Glob(path=pattern)
+    pattern = re.compile(r".*_([0-9]*)." + ext)
+    fpaths = sorted(fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+    return fpaths
+
+
 def get_vtu_data(
     data_dir,
-    vtu_basename="",
+    basename="",
     nektar_fname_fmt=False,
     registration_name=None,
 ):
@@ -76,27 +87,30 @@ def get_vtu_data(
     if registration_name is None:
         registration_name = gen_registration_name("vtu_data")
 
-    glob_pattern = f"{data_dir}/{vtu_basename}*.vtu"
-    vtu_fpaths = paraview.util.Glob(path=glob_pattern)
-
-    # Sort
-    pattern = re.compile(r".*_([0-9]*).vtu")
-    vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+    # Look for pvtu first
+    fpaths = get_paths(data_dir, basename, "pvtu")
+    if fpaths:
+        partitioned = True
+    else:
+        fpaths = get_paths(data_dir, basename, "vtu")
+        partitioned = False
 
     # Check for multiple basenames if none was specified
-    if not vtu_basename:
+    if not basename:
         unique_basenames = set(
-            [
-                _extract_basename(p, nektar_fname_fmt=nektar_fname_fmt)
-                for p in vtu_fpaths
-            ]
+            [_extract_basename(p, nektar_fname_fmt=nektar_fname_fmt) for p in fpaths]
         )
         if len(unique_basenames) > 1:
             print(
-                f"get_vtu_data: WARNING - Found vtus with multiple basenames in {data_dir}; pass 'vtu_basename' to choose one"
+                f"get_vtu_data: WARNING - Found pvtus/vtus with multiple basenames in {data_dir}; pass 'basename=' to choose one"
             )
 
-    vtu_data = XMLUnstructuredGridReader(
-        registrationName=registration_name, FileName=vtu_fpaths
-    )
-    return vtu_data
+    if partitioned:
+        data = XMLPartitionedUnstructuredGridReader(
+            registrationName=registration_name, FileName=fpaths
+        )
+    else:
+        data = XMLUnstructuredGridReader(
+            registrationName=registration_name, FileName=fpaths
+        )
+    return data
