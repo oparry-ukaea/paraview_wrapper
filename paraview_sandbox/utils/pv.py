@@ -69,9 +69,47 @@ def data_file_exists(data_dir, fname):
     return len(tmp) >= 1
 
 
+def my_glob(path, rootDir=None):
+    """Custom version of paraview.utils.Glob"""
+    import paraview.servermanager as sm
+    import fnmatch
+    import os.path
+
+    head_tail = os.path.split(path)
+    dirPath = head_tail[0]
+    fileName = head_tail[1]
+
+    fileInfoHelperProxy = sm.ProxyManager().NewProxy("misc", "FileInformationHelper")
+    fileInfoHelperProxy.GetProperty("DirectoryListing").SetElement(0, True)
+    fileInfoHelperProxy.GetProperty("Path").SetElement(0, dirPath)
+    fileInfoHelperProxy.GetProperty("GroupFileSequences").SetElement(0, False)
+    if rootDir != None:
+        fileInfoHelperProxy.GetProperty("WorkingDirectory").SetElement(0, rootDir)
+    fileInfoHelperProxy.UpdateVTKObjects()
+
+    localFileInfo = sm.vtkPVFileInformation()
+    # ====== Modified part ======
+    contents = localFileInfo.GetContents()
+    fileInfoHelperProxy.GatherInformation(localFileInfo)
+    numFiles = contents.GetNumberOfItems()
+
+    foundFiles = []
+    names = [contents.GetItemAsObject(idx).GetName() for idx in range(numFiles)]
+    for name in names:
+        if fnmatch.fnmatch(name, fileName):
+            foundFiles.append(dirPath + "/" + name)
+    # ====== /Modified part ======
+
+    foundFiles.sort()
+
+    return foundFiles
+
+
 def get_paths(data_dir, basename, ext):
     pattern = f"{data_dir}/{basename}*.{ext}"
-    fpaths = paraview.util.Glob(path=pattern)
+    # PV glov is extremely slow for some reason, use a custom version
+    # fpaths = paraview.util.Glob(path=pattern)
+    fpaths = my_glob(path=pattern)
     pattern = re.compile(r".*_([0-9]*)." + ext)
     fpaths = sorted(fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
     return fpaths
