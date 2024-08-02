@@ -1,4 +1,5 @@
 from .locations import get_output_dir, get_output_fpath
+from .misc import report_kwargs, set_default_kwargs
 from .nektar import get_nektar_params
 from .plotting import get_color_array
 from .pv import gen_cbar_props, gen_opacity_pts, get_data_dim
