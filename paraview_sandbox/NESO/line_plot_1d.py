@@ -116,6 +116,9 @@ def line_plot_1d(
         elif series_lbl_mode == "basename":
             series_lbls = [os.path.basename(d) for d in data_dirs]
 
+    if host:
+        Connect(host)
+
     # Set line start-end points
     vtu_data = {}
     if pts_arr is None:
@@ -147,9 +150,6 @@ def line_plot_1d(
 
     # Output path
     output_fpath = os.path.join(output_dir, output_basename + ".avi")
-
-    if host:
-        Connect(host)
 
     # Set up plot settings
     int_plot_settings = dict(
