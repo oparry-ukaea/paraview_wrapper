@@ -2,7 +2,7 @@ import datetime
 import os.path
 from paraview.simple import (
     CreateView,
-    Hide,
+    Delete,
     Show,
     XMLUnstructuredGridReader,
     XMLPartitionedUnstructuredGridReader,
@@ -26,7 +26,7 @@ def get_ugrid_props(data):
     dummy_view = CreateView("RenderView")
     dummy_display = Show(data, dummy_view, "UnstructuredGridRepresentation")
     bounds = data.GetDataInformation().GetBounds()
-    Hide(data, dummy_view)
+    Delete(dummy_view)
 
     # Determine number of dims by finding max dim where min != max
     for idim in [3, 2, 1]:
