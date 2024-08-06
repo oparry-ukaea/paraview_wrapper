@@ -1,12 +1,26 @@
 import os.path
-from paraview.simple import *
+from paraview.simple import (
+    _DisableFirstRenderCameraReset,
+    AssignViewToLayout,
+    Connect,
+    CreateView,
+    GetActiveViewOrCreate,
+    GetAnimationScene,
+    GetLayout,
+    Hide,
+    PlotOverLine,
+    PythonCalculator,
+    SaveAnimation,
+    SetActiveSource,
+    Show,
+)
 import re
 
 from .time_filter import add_time_filter
 from ..utils import get_color_array, get_vtu_data
 
 ### disable automatic camera reset on 'Show'
-paraview.simple._DisableFirstRenderCameraReset()
+_DisableFirstRenderCameraReset()
 
 
 class PyExpr:
