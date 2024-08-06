@@ -57,6 +57,9 @@ def line_plot_1d(
     # Output path
     output_fpath = os.path.join(output_dir, output_basename + ".avi")
 
+    if host:
+        Connect(host)
+
     vtu_data = get_vtu_data(data_dir, basename=vtu_basename)
 
     # get animation scene
