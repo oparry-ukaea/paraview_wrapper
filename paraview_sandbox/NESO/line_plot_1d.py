@@ -14,7 +14,12 @@ from paraview.simple import (
 import re
 
 from .time_filter import add_time_filter
-from ..utils import gen_registration_name, get_color_array, get_vtu_data
+from ..utils import (
+    gen_registration_name,
+    get_color_array,
+    get_ugrid_bounds,
+    get_vtu_data,
+)
 
 ### disable automatic camera reset on 'Show'
 _DisableFirstRenderCameraReset()
@@ -77,17 +82,18 @@ def line_plot_1d(
     varnames,
     data_dirs,
     output_dir,
-    pts_arr=None,
-    dt=None,
-    vtu_basename="",
     animation_settings={},
+    axis=None,
+    dt=None,
     exprs_to_plot=[],
+    host="",
     output_basename="",
     plot_settings={},
+    pts_arr=None,
     series_lbls=None,
     series_lbl_mode="var",
     tlbl_settings={},
-    host="",
+    vtu_basename="",
 ):
     nseries = len(varnames)
     if isinstance(data_dirs, str):
@@ -109,12 +115,21 @@ def line_plot_1d(
             series_lbls = varnames
         elif series_lbl_mode == "basename":
             series_lbls = [os.path.basename(d) for d in data_dirs]
-        # series_lbls.extend([expr.name for expr in exprs_to_plot]) # Move after main series processing
 
-    # Check line start-end points, set default if necessary
-    pts_def = [[0.0, 0.0, 0.0], [2.0, 0.0, 0.0]]  # 2.0 for historical reasons!
+    # Set line start-end points
+    vtu_data = {}
     if pts_arr is None:
-        pts_arr = pts_def * nseries
+        midpoints = [0.0, 0.0, 0.0]
+        pts = [list(midpoints), list(midpoints)]
+        # Get axis lims using first data dir
+        vtu_data[data_dirs[0]] = get_vtu_data(data_dirs[0], basename=vtu_basename)
+        axis_min, axis_max = get_ugrid_bounds(
+            vtu_data[data_dirs[0]], 0 if axis is None else axis
+        )
+        pts[0][axis] = axis_min
+        pts[1][axis] = axis_max
+        # Same start-end points for all series
+        pts_arr = [pts] * nseries
     elif len(pts_arr) == 1:
         if nseries > 1:
             pts_arr = [pts_arr[0]] * nseries
@@ -156,7 +171,6 @@ def line_plot_1d(
     # Update animation scene based on data timesteps
     anim_scene.UpdateAnimationUsingDataTimeSteps()
 
-    vtu_data = {}
     line_plots = []
     view = CreateView("XYChartView")
     displays = []
