@@ -56,11 +56,25 @@ def gen_registration_name(prefix):
     return prefix + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
 
 
-def _extract_basename(p, nektar_fname_fmt=False):
+def _extract_basename(p, partitioned=False, nektar_fname_fmt=False):
     if nektar_fname_fmt:
         return os.path.split(p)[-1].split("_")[0]
     else:
-        return os.path.basename(p)
+        bn = os.path.basename(p)
+        if partitioned:
+            try:
+                return (
+                    re.compile("(.*)_[0-9]+\.pvtu$")
+                    .search(os.path.basename(p))
+                    .groups()[0]
+                )
+            except:
+                print(
+                    f"Failed to extract basename from path {p} (partitioned={partitioned}, nektar_fname_fmt={nektar_fname_fmt})"
+                )
+                raise
+        else:
+            return bn
 
 
 def data_file_exists(data_dir, fname):
@@ -136,7 +150,10 @@ def get_vtu_data(
     # Check for multiple basenames if none was specified
     if not basename:
         unique_basenames = set(
-            [_extract_basename(p, nektar_fname_fmt=nektar_fname_fmt) for p in fpaths]
+            [
+                _extract_basename(p, partitioned, nektar_fname_fmt=nektar_fname_fmt)
+                for p in fpaths
+            ]
         )
         if len(unique_basenames) > 1:
             print(
