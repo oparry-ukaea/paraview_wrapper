@@ -1,3 +1,9 @@
+import datetime
+import os.path
+from paraview.simple import XMLUnstructuredGridReader
+import paraview.util
+import re
+
 def get_data_dim(vtu_data):
     info = vtu_data.GetDataInformation()
     bounds = info.GetBounds()
@@ -38,3 +44,38 @@ def gen_opacity_pts(opacity_vals):
         pts.extend(val_op)
         pts.extend((0.5, 0.0))
     return pts
+
+
+def gen_registration_name(prefix):
+    return prefix + datetime.datetime.now().strftime(
+            "%Y-%m-%d-%H-%M-%S-%f"
+        )
+
+def get_vtu_data(
+    data_dir,
+    vtu_basename="",
+    registration_name=None,
+):
+    # Default registration name
+    if registration_name is None:
+        registration_name = gen_registration_name("vtu_data")
+
+    glob_pattern = f"{data_dir}/{vtu_basename}*.vtu"
+    vtu_fpaths = paraview.util.Glob(path=glob_pattern)
+
+    # Sort
+    pattern = re.compile(r".*_([0-9]*).vtu")
+    vtu_fpaths = sorted(vtu_fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+
+    # Check for multiple basenames if none was specified
+    if not vtu_basename:
+        unique_basenames = set([os.path.basename(p) for p in vtu_fpaths])
+        if len(unique_basenames) > 1:
+            print(
+                f"get_vtu_data: WARNING - Found vtus with multiple basenames in {data_dir}; pass 'vtu_basename' to choose one"
+            )
+
+    vtu_data = XMLUnstructuredGridReader(
+        registrationName=registration_name, FileName=vtu_fpaths
+    )
+    return vtu_data
