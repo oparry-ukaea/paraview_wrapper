@@ -4,12 +4,14 @@ from paraview.simple import XMLUnstructuredGridReader
 import paraview.util
 import re
 
+
 def get_data_dim(vtu_data):
     info = vtu_data.GetDataInformation()
     bounds = info.GetBounds()
     for idim in [3, 2, 1]:
         if bounds[2 * idim - 1] > bounds[2 * idim - 2]:
             return idim
+
 
 def gen_cbar_props(user_settings, **defaults):
     # Common defaults
@@ -27,7 +29,8 @@ def gen_cbar_props(user_settings, **defaults):
     props.update(**defaults)
     props.update(**user_settings)
     return props
-        
+
+
 def gen_opacity_pts(opacity_vals):
     # Check types
     try:
@@ -47,13 +50,20 @@ def gen_opacity_pts(opacity_vals):
 
 
 def gen_registration_name(prefix):
-    return prefix + datetime.datetime.now().strftime(
-            "%Y-%m-%d-%H-%M-%S-%f"
-        )
+    return prefix + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+
+def _extract_basename(p, nektar_fname_fmt=False):
+    if nektar_fname_fmt:
+        return os.path.split(p)[-1].split("_")[0]
+    else:
+        return os.path.basename(p)
+
 
 def get_vtu_data(
     data_dir,
     vtu_basename="",
+    nektar_fname_fmt=False,
     registration_name=None,
 ):
     # Default registration name
@@ -69,7 +79,12 @@ def get_vtu_data(
 
     # Check for multiple basenames if none was specified
     if not vtu_basename:
-        unique_basenames = set([os.path.basename(p) for p in vtu_fpaths])
+        unique_basenames = set(
+            [
+                _extract_basename(p, nektar_fname_fmt=nektar_fname_fmt)
+                for p in vtu_fpaths
+            ]
+        )
         if len(unique_basenames) > 1:
             print(
                 f"get_vtu_data: WARNING - Found vtus with multiple basenames in {data_dir}; pass 'vtu_basename' to choose one"
