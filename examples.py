@@ -31,10 +31,14 @@ def driftwave_movie3D(data_dir, outfname_suffix="", **kwargs):
 
 def driftwave_movie(
     data_dir,
+    var_name="n",
     host="",
     output_basename="driftwave",
     output_dir=get_desktop_dir(),
     animation_settings=dict(FrameRate=15, FrameWindow=[1, 200], Quality=2),
+    cbar_settings=dict(
+        title="Δn", label_fontsize=20, pos=[0.9, 0.06], title_fontsize=20
+    ),
     max_val=1.0,
     tlbl_settings=dict(pos=[0.02, 0.02], fontsize=32),
     view_settings=dict(
@@ -43,6 +47,8 @@ def driftwave_movie(
         up=[0.0, 1, 0.0],
         pscale=23.4,
     ),
+    particle_fname="",
+    particle_props={},
     render_type="Surface",
     vtu_basename="square_quads_",
 ):
@@ -55,20 +61,20 @@ def driftwave_movie(
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
 
     gen_movie(
-        "n",
+        var_name,
         data_dir=data_dir,
         output_dir=output_dir,
         dt=dt_chk,
         output_fname=f"{output_basename}.avi",
         animation_settings=animation_settings,
-        cbar_settings=dict(
-            title="Δn", label_fontsize=20, pos=[0.9, 0.06], title_fontsize=20
-        ),
+        cbar_settings=cbar_settings,
         data_settings=dict(
             opacities=[(-max_val, 1.0), (0.0, 0.0), (max_val, 1.0)],
             range=[-max_val, max_val],
             render_type=render_type,
         ),
+        particle_fname=particle_fname,
+        particle_props=particle_props,
         tlbl_settings=tlbl_settings,
         view_settings=view_settings,
         vtu_basename=vtu_basename,
@@ -280,14 +286,14 @@ def t4c3_movie_fluid_full(data_dir, host):
     hw3d_fluid_only_movie(data_dir, host=host, output_basename="t4c3_fluid-only_turb")
 
 
-def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
+def t4c4_HW3D_imgs(data_dir, var, output_dir=get_desktop_dir()):
     """
     Images of a 3DHW sim used in the t4c4 report.
     """
-    for output_time in [0.0, 50.0, 100.0, 160.0]:
+    for output_time in [0.0, 40.0, 70.0, 100.0, 130.0, 160.0]:
         gen_img(
             data_dir,
-            "ne",
+            var,
             output_time,
             fluid_props=dict(
                 cbar_pos=[0.03, 0.04],
@@ -304,7 +310,7 @@ def t4c4_HW3D_imgs(data_dir, output_dir=get_desktop_dir()):
                 pscale=6.12,
                 up=[-0.4, 0.090, -0.91],
             ),
-            output_basename="t4c4_HW3D",
+            output_basename=f"t6c5_HW3D_{var}",
             output_dir=output_dir,
         )
 
@@ -431,8 +437,10 @@ def hw2d_comp_slice(
     animation_settings=dict(FrameRate=20),
     tlbl_settings={},
     fluid_view_settings=dict(
-        pos=[8.15e-3, 8.15e-3, 5.043335426733482],
-        fpt=[8.15e-3, 8.15e-3, 5.0],
+        pos=[773.7422539156483 * v for v in [8.15e-3, 8.15e-3, 5.043335426733482]],
+        fpt=[773.7422539156483 * v for v in [8.15e-3, 8.15e-3, 5.0]],
+        # pos=[773.7422539156483 * v for v in [8.15e-3, 8.15e-3, 8.15e-3]],
+        # fpt=[773.7422539156483 * v for v in [8.15e-3, 8.15e-3, 8.15e-3]],
         up=[0.0, 1.0, 0.0],
         pscale=5.000013284482842,
         show_axes_grid=1,
@@ -440,10 +448,11 @@ def hw2d_comp_slice(
     ),
     slice_settings=dict(origin=[0, 0, 5.0]),
     max_val=None,
+    convert_to_mp4=False,
 ):
-    fluid_props = dict(cbar_orient="Vertical", cbar_pos=[0.12, 0.15])
+    fluid_props = dict(cbar_orient="Vertical", cbar_pos=[0.09, 0.13])
     if max_val is None:
-        max_vals = dict(ne=3.1, w=0.2, phi=5e-8)
+        max_vals = dict(ne=0.75, w=0.2, phi=0.03)
         max_vals.get(var, 1.0)
         max_val = max_vals[var]
     fluid_props["cbar_range"] = [-max_val, max_val]
@@ -472,6 +481,8 @@ def hw2d_comp_slice(
         fluid_view_settings=fluid_view_settings,
         tlbl_settings=tlbl_settings,
     )
+    if chk_num is None and convert_to_mp4:
+        avi_to_mp4(output_dir, f"{output_basename}_{var}")
 
 
 def hw3d_comp_movie(
