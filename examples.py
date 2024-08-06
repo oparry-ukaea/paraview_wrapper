@@ -1,4 +1,4 @@
-from paraview_sandbox.NESO import gen_movie, gen_img, line_plot_1d, PyExpr
+from paraview_sandbox.NESO import fluid_slice, gen_movie, gen_img, line_plot_1d, PyExpr
 from paraview_sandbox.utils import (
     avi_to_mp4,
     get_desktop_dir,
@@ -389,3 +389,80 @@ def t4c3_movie_zoomed_blob(data_dir, output_dir=get_desktop_dir()):
         ),
     )
     avi_to_mp4(get_desktop_dir(), output_basename)
+
+
+def hw2d_comp_slice(
+    data_dir,
+    var,
+    chk_num=None,
+    host="",
+    output_basename="",
+    output_dir=get_desktop_dir(),
+    animation_settings=dict(FrameRate=20, FrameWindow=[1, 100], Quality=2),
+    tlbl_settings={},
+    fluid_view_settings=dict(
+        pos=[8.15e-3, 8.15e-3, 5.043335426733482],
+        fpt=[8.15e-3, 8.15e-3, 5.0],
+        up=[0.0, 1.0, 0.0],
+        pscale=5.000013284482842,
+        show_axes_grid=1,
+        show_orient_axes=0,
+    ),
+):
+    max_vals = dict(ne=2e-11, w=0.2, phi=5e-8)
+    fluid_props = dict(cbar_orient="Vertical", cbar_pos=[0.05, 0.05])
+    if var in max_vals:
+        fluid_props["cbar_range"] = [-max_vals[var], max_vals[var]]
+
+    # Compute dt if no single chk file specified (i.e. for animations)
+    dt_chk = None
+    if chk_num is None:
+        # Set checkpoint dt from nektar params
+        nek_params = get_nektar_params(data_dir)
+        dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+    # # Set checkpoint dt from nektar params
+    # nek_params = get_nektar_params(data_dir)
+    # dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+
+    fluid_slice(
+        data_dir,
+        var,
+        dt=dt_chk,
+        animation_settings=animation_settings,
+        output_time=chk_num,
+        host=host,
+        output_basename=output_basename,
+        output_dir=output_dir,
+        slice_settings={},
+        fluid_props=fluid_props,
+        fluid_view_settings=fluid_view_settings,
+        tlbl_settings=tlbl_settings,
+    )
+
+
+def hw3d_comp_movie(
+    data_dir,
+    host="",
+    output_basename="",
+    output_dir=get_desktop_dir(),
+    animation_settings=dict(FrameRate=20, FrameWindow=[1, 100], Quality=2),
+    max_val=0.1,
+    tlbl_settings={},
+    view_settings=dict(
+        pos=[8.15e-3, 8.15e-3, -14.3],
+        fpt=[8.15e-3, 8.15e-3, 5.0],
+        up=[0.0, 1.0, 0.0],
+        pscale=0.009276864953126482,
+        show_axes_grid=1,
+        show_orient_axes=0,
+    ),
+):
+    """
+    Slice movie for comparison of H3 / NESO HW sims
+    """
+
+    # # Set checkpoint dt from nektar params
+    # nek_params = get_nektar_params(data_dir)
+    # dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
+    raise NotImplementedError("hw3d_comp_movie not finished yet")
+    # avi_to_mp4(output_dir, output_basename)
