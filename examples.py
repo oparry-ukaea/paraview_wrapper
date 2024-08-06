@@ -105,8 +105,9 @@ def ne_Ge_line_plot(
     data_dir,
     host="",
     output_dir=get_desktop_dir(),
+    output_basename=None,
     animation_settings={},
-    line_dim=0,
+    axis=0,
 ):
     nek_params = get_nektar_params(data_dir)
 
@@ -115,22 +116,27 @@ def ne_Ge_line_plot(
     T = nek_params.get("T", 1.0)
     nstar = nek_params.get("nstar", 1.0)
     dt_chk = nek_params["TimeStep"] * nek_params["IO_CheckSteps"]
-    series_colors = {}
+    series_colors = dict(ne="g", Ge="r")
     series_colors["ne Equilibrium"] = "g"
     series_colors["Ge Equilibrium"] = "r"
+    series_lstys = dict(ne="1", Ge="1")
+    series_lstys["ne Equilibrium"] = "2"
+    series_lstys["Ge Equilibrium"] = "2"
     plot_settings = dict(
         xlabel="z",
         xrange=[0.0, 2.0],
         yrange=[-1.2, 1.1 * (delta + 1 / delta)],
         colors=series_colors,
+        lstys=series_lstys,
         legend_pos=[260, 80],
     )
-    output_basename = f"1Din{line_dim+1}DDoutflow_delta{delta}_ne-Ge_profs"
+    if output_basename is None:
+        output_basename = f"1Din{axis+1}DDoutflow_delta{delta}_ne-Ge_profs"
 
     tlbl_settings = {}
     # Add some expressions to the line plot
     nstar_rootT = f"{nstar}*sqrt({T})"
-    z_str = f"(inputs[0].Points[:,{line_dim}]-1)"
+    z_str = f"(inputs[0].Points[:,{axis}]-1)"
     c_str = f"{nstar_rootT}*({delta}+1/{delta})"
     R_str = f"{nstar_rootT}*sqrt({delta}**2+1/{delta}**2+2-4*{z_str}**2)"
     ne_str = f"({c_str}+{R_str})/2/{T}"
@@ -153,7 +159,7 @@ def ne_Ge_line_plot(
         data_dir,
         output_dir,
         host=host,
-        line_dim=line_dim,
+        axis=axis,
         dt=dt_chk,
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
@@ -181,7 +187,7 @@ def t4c2_1d_profs(
     plot_settings = dict(
         xrange=[0.0, 110.0],
         yrange=[-1.2, 2.5],
-        lstys=dict(u=1, T=1),
+        lstys=dict(rho="1", u="1", T="1"),
         colors=dict(rho="b", u="g", T="r"),
     )
 
@@ -206,7 +212,7 @@ def t4c2_1d_profs(
         data_dir,
         output_dir,
         dt=dt_chk,
-        pt2=[110.0, 0.0, 0.0],
+        pts_arr=[[[0.0, 0.0, 0.0], [110.0, 0.0, 0.0]]],
         animation_settings=animation_settings,
         exprs_to_plot=exprs_to_plot,
         output_basename=output_basename,

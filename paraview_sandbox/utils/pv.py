@@ -1,6 +1,9 @@
 import datetime
 import os.path
 from paraview.simple import (
+    CreateView,
+    Hide,
+    Show,
     XMLUnstructuredGridReader,
     XMLPartitionedUnstructuredGridReader,
 )
@@ -8,12 +11,29 @@ import paraview.util
 import re
 
 
-def get_data_dim(vtu_data):
-    info = vtu_data.GetDataInformation()
-    bounds = info.GetBounds()
+def get_ugrid_bounds(d, axis):
+    bounds = get_ugrid_props(d)["bounds"]
+    min_max = (bounds[2 * axis], bounds[2 * axis + 1])
+    if min_max[1] <= min_max[0]:
+        raise RuntimeError(
+            f"get_ugrid_bounds() found invalid bounds for axis {axis}: min={min_max[0]} max={min_max[1]}"
+        )
+    return min_max
+
+
+def get_ugrid_props(data):
+    # Dummy Show() required to force initialisation of data info
+    dummy_view = CreateView("RenderView")
+    dummy_display = Show(data, dummy_view, "UnstructuredGridRepresentation")
+    bounds = data.GetDataInformation().GetBounds()
+    Hide(data, dummy_view)
+
+    # Determine number of dims by finding max dim where min != max
     for idim in [3, 2, 1]:
         if bounds[2 * idim - 1] > bounds[2 * idim - 2]:
-            return idim
+            break
+
+    return dict(bounds=bounds, ndims=idim)
 
 
 def gen_cbar_props(user_settings, **defaults):
@@ -56,11 +76,25 @@ def gen_registration_name(prefix):
     return prefix + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
 
 
-def _extract_basename(p, nektar_fname_fmt=False):
+def _extract_basename(p, partitioned=False, nektar_fname_fmt=False):
     if nektar_fname_fmt:
         return os.path.split(p)[-1].split("_")[0]
     else:
-        return os.path.basename(p)
+        bn = os.path.basename(p)
+        if partitioned:
+            try:
+                return (
+                    re.compile("(.*)_[0-9]+\.pvtu$")
+                    .search(os.path.basename(p))
+                    .groups()[0]
+                )
+            except:
+                print(
+                    f"Failed to extract basename from path {p} (partitioned={partitioned}, nektar_fname_fmt={nektar_fname_fmt})"
+                )
+                raise
+        else:
+            return bn
 
 
 def data_file_exists(data_dir, fname):
@@ -136,7 +170,10 @@ def get_vtu_data(
     # Check for multiple basenames if none was specified
     if not basename:
         unique_basenames = set(
-            [_extract_basename(p, nektar_fname_fmt=nektar_fname_fmt) for p in fpaths]
+            [
+                _extract_basename(p, partitioned, nektar_fname_fmt=nektar_fname_fmt)
+                for p in fpaths
+            ]
         )
         if len(unique_basenames) > 1:
             print(

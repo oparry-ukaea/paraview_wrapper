@@ -7,7 +7,8 @@ from .pv import (
     gen_cbar_props,
     gen_opacity_pts,
     gen_registration_name,
-    get_data_dim,
+    get_ugrid_bounds,
+    get_ugrid_props,
     get_vtu_data,
 )
 from .system import get_desktop_dir
