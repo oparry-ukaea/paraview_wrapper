@@ -11,4 +11,4 @@ from .pv import (
     get_vtu_data,
 )
 from .system import get_desktop_dir
-from .video import avi_to_mp4
+from .video import avi_to_gif, avi_to_mp4
