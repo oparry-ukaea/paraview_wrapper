@@ -16,7 +16,7 @@ from paraview.simple import (
     Show,
 )
 
-from ..utils import gen_cbar_props, gen_opacity_pts, get_data_dim, get_vtu_data
+from ..utils import gen_cbar_props, gen_opacity_pts, get_ugrid_props, get_vtu_data
 
 
 def gen_img(
@@ -88,8 +88,7 @@ def gen_img(
         AssignViewToLayout(view=fluid_view, layout=layout)
 
     # Get data dimension, this only works after calling Show()!
-    data_ndims = get_data_dim(fluid_data)
-
+    data_ndims = get_ugrid_props(fluid_data)["ndims"]
     # Common settings for both views
     for view in views:
         view.OrientationAxesVisibility = 0

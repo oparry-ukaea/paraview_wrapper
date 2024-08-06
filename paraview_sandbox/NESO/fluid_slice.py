@@ -24,7 +24,7 @@ from ..utils import (
     gen_cbar_props,
     gen_opacity_pts,
     gen_registration_name,
-    get_data_dim,
+    get_ugrid_props,
     get_vtu_data,
 )
 
@@ -94,7 +94,7 @@ def fluid_slice(
 
     # Get data dimension, this only works after calling Show()!
     _dummy = Show(fluid_data, fluid_view, "UnstructuredGridRepresentation")
-    data_ndims = get_data_dim(fluid_data)
+    data_ndims = get_ugrid_props(fluid_data)["ndims"]
     Hide(fluid_data, fluid_view)
     # if plotting_particles:
     #     layout.SplitVertical(0, 0.5)

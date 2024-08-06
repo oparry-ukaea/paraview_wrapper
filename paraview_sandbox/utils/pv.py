@@ -1,6 +1,9 @@
 import datetime
 import os.path
 from paraview.simple import (
+    CreateView,
+    Hide,
+    Show,
     XMLUnstructuredGridReader,
     XMLPartitionedUnstructuredGridReader,
 )
@@ -8,12 +11,29 @@ import paraview.util
 import re
 
 
-def get_data_dim(vtu_data):
-    info = vtu_data.GetDataInformation()
-    bounds = info.GetBounds()
+def get_ugrid_bounds(d, axis):
+    bounds = get_ugrid_props(d)["bounds"]
+    min_max = (bounds[2 * axis], bounds[2 * axis + 1])
+    if min_max[1] <= min_max[0]:
+        raise RuntimeError(
+            f"get_ugrid_bounds() found invalid bounds for axis {axis}: min={min_max[0]} max={min_max[1]}"
+        )
+    return min_max
+
+
+def get_ugrid_props(data):
+    # Dummy Show() required to force initialisation of data info
+    dummy_view = CreateView("RenderView")
+    dummy_display = Show(data, dummy_view, "UnstructuredGridRepresentation")
+    bounds = data.GetDataInformation().GetBounds()
+    Hide(data, dummy_view)
+
+    # Determine number of dims by finding max dim where min != max
     for idim in [3, 2, 1]:
         if bounds[2 * idim - 1] > bounds[2 * idim - 2]:
-            return idim
+            break
+
+    return dict(bounds=bounds, ndims=idim)
 
 
 def gen_cbar_props(user_settings, **defaults):
