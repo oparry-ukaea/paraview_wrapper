@@ -56,9 +56,9 @@ def set_series_props(display, varname, series_lbl, plot_settings):
     except:
         lsty_defined = False
     if lsty_defined:
-        lstys[series_idx + 1] = str(plot_settings["lstys"].get(series_lbl, 2))
+        lstys[series_idx + 1] = str(plot_settings["lstys"].get(series_lbl, 1))
     else:
-        lstys.extend([varname, "2"])
+        lstys.extend([varname, "1"])
     display.SeriesLineStyle.SetData(lstys)
 
     # Set color
