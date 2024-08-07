@@ -1,5 +1,5 @@
-from paraview_sandbox.NESO import fluid_slice, gen_movie, gen_img, line_plot_1d, PyExpr
-from paraview_sandbox.utils import (
+from paraview_wrapper.NESO import fluid_slice, gen_movie, gen_img, line_plot_1d, PyExpr
+from paraview_wrapper.utils import (
     avi_to_mp4,
     get_desktop_dir,
     get_nektar_params,
