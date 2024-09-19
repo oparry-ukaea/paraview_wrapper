@@ -245,7 +245,7 @@ def line_plot_1d(
         fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
 
     # Add view to layout
-    layout = GetLayout()
+    layout = GetLayout(view)
     if "ImageResolution" in int_animation_settings:
         layout.SetSize(*int_animation_settings["ImageResolution"])
     AssignViewToLayout(view=view, layout=layout, hint=0)

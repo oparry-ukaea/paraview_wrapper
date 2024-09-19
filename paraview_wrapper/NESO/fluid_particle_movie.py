@@ -241,7 +241,7 @@ def gen_movie(
         fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
 
     # Set layout/tab size in pixels
-    layout = GetLayout()
+    layout = GetLayout(view)
     layout.SetSize(*int_animation_settings["ImageResolution"])
 
     print("Saving animation...")
