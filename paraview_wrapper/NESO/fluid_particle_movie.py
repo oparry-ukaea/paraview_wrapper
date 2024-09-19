@@ -18,7 +18,12 @@ from paraview.simple import (
 import re
 
 from .time_filter import add_time_filter
-from ..utils import data_file_exists, gen_opacity_pts, get_vtu_data
+from ..utils import (
+    data_file_exists,
+    gen_opacity_pts,
+    get_ugrid_props,
+    get_vtu_data,
+)
 
 #### disable automatic camera reset on 'Show'
 _DisableFirstRenderCameraReset()
@@ -215,6 +220,8 @@ def gen_movie(
             print("Rendering in 'Projected tetra' mode; hiding coord axes")
         view.AxesGrid.Visibility = 0
 
+    data_ndims = get_ugrid_props(vtu_data)["ndims"]
+    view.InteractionMode = f"{data_ndims}D"
     view.CameraPosition = int_view_settings["pos"]
     view.CameraFocalPoint = int_view_settings["fpt"]
     view.CameraViewUp = int_view_settings["up"]
