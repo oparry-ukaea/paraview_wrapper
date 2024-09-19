@@ -159,6 +159,8 @@ def gen_movie(
         opacity_map = GetOpacityTransferFunction(varname)
         opacity_map.Points = gen_opacity_pts(data_settings["opacities"])
         color_tf.EnableOpacityMapping = 1
+    else:
+        color_tf.EnableOpacityMapping = 0
 
     # Color bar properties
     int_cbar_settings = dict(
