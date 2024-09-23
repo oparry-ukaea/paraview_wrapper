@@ -55,6 +55,10 @@ def gen_cbar_props(user_settings, **defaults):
     return props
 
 
+def gen_default_opacity_pts(min_max):
+    return gen_opacity_pts([(min_max[0], 1.0), (min_max[1], 1.0)])
+
+
 def gen_opacity_pts(opacity_vals):
     # Check types
     try:

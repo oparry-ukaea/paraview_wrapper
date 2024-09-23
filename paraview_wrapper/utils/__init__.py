@@ -5,6 +5,7 @@ from .plotting import get_color_array
 from .pv import (
     data_file_exists,
     gen_cbar_props,
+    gen_default_opacity_pts,
     gen_opacity_pts,
     gen_registration_name,
     get_ugrid_bounds,

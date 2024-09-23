@@ -10,16 +10,19 @@ from paraview.simple import (
     GetLayout,
     GetOpacityTransferFunction,
     GetScalarBar,
+    GetTransferFunction2D,
     H5PartReader,
     SaveAnimation,
     SetActiveSource,
     Show,
+    Slice,
 )
 import re
 
 from .time_filter import add_time_filter
 from ..utils import (
     data_file_exists,
+    gen_default_opacity_pts,
     gen_opacity_pts,
     get_ugrid_props,
     get_vtu_data,
@@ -45,6 +48,7 @@ def gen_movie(
     view_settings={},
     output_fname="",
     host="",
+    **kwargs,
 ):
     if not output_fname:
         output_fname = f"{varname}_movie.avi"
@@ -198,6 +202,40 @@ def gen_movie(
     if int_cbar_settings["vals"]:
         cbar.UseCustomLabels = 1
         cbar.CustomLabels = int_cbar_settings["vals"]
+
+    slice_settings = kwargs.get("slice_settings", {})
+    if slice_settings:
+        slice_settings["axis"] = slice_settings.pop("axis", "z")
+
+        # Create slice
+        slice = Slice(registrationName="Slice1", Input=vtu_data)
+        slice.SliceType = "Plane"
+        slice.HyperTreeGridSlicer = "Plane"
+        slice.SliceOffsetValues = [0.0]
+
+        # Set norm
+        slice_idx = dict(x=0, y=1, z=2)
+        slice_normal = [0.0, 0.0, 0.0]
+        slice_normal[slice_idx[slice_settings["axis"]]] = 1.0
+        slice.SliceType.Normal = slice_normal
+        slice_display = Show(slice, view, "GeometryRepresentation")
+        slice_display.OpacityTransferFunction.Points = gen_default_opacity_pts(
+            int_data_settings["range"]
+        )
+        # set scalar coloring using an separate color/opacity maps
+        ColorBy(slice_display, ("POINTS", varname), True)
+
+        # get separate opacity transfer function/opacity map for 'density'
+        slice_opacity_tf = GetOpacityTransferFunction(
+            varname, slice_display, separate=True
+        )
+
+        # get separate 2D transfer function for 'density'
+        slice_color_tf = GetColorTransferFunction(varname, slice_display, separate=True)
+        slice_color_tf.RescaleTransferFunction(*int_data_settings["range"])
+
+        if "opacities" in slice_settings:
+            slice_opacity_tf.Points = gen_opacity_pts(slice_settings["opacities"])
 
     # Add a time label
     if dt is not None:
