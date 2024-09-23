@@ -10,6 +10,7 @@ from .pv import (
     get_ugrid_bounds,
     get_ugrid_props,
     get_vtu_data,
+    scale_data,
 )
 from .system import get_desktop_dir
 from .video import avi_to_gif, avi_to_mp4

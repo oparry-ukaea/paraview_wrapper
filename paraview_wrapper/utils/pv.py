@@ -4,6 +4,7 @@ from paraview.simple import (
     CreateView,
     Delete,
     Show,
+    Transform,
     XMLUnstructuredGridReader,
     XMLPartitionedUnstructuredGridReader,
 )
@@ -189,3 +190,20 @@ def get_vtu_data(
             registrationName=registration_name, FileName=fpaths
         )
     return data
+
+
+def scale_data(data, scale_facs):
+    if type(scale_facs) != list:
+        raise TypeError("scale_data: expected scaling factors in a list")
+    data_ndims = get_ugrid_props(data)["ndims"]
+    nfacs = len(scale_facs)
+    if nfacs != data_ndims:
+        raise ValueError(
+            f"scale_data: scaling factor list length ({nfacs}) doesn't match number of dimension ({data_ndims})"
+        )
+    scaled_data = Transform(
+        registrationName=gen_registration_name("Transform"), Input=data
+    )
+    scaled_data.Transform = "Transform"
+    scaled_data.Transform.Scale = scale_facs
+    return scaled_data

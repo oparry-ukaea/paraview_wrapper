@@ -23,6 +23,7 @@ from ..utils import (
     gen_opacity_pts,
     get_ugrid_props,
     get_vtu_data,
+    scale_data,
 )
 
 #### disable automatic camera reset on 'Show'
@@ -54,7 +55,13 @@ def gen_movie(
     if host:
         Connect(host)
 
-    vtu_data = get_vtu_data(data_dir, basename=vtu_basename)
+    raw_vtu_data = get_vtu_data(data_dir, basename=vtu_basename)
+
+    scale_facs = view_settings.get("scale")
+    if scale_facs is None:
+        vtu_data = raw_vtu_data
+    else:
+        vtu_data = scale_data(raw_vtu_data, scale_facs)
 
     # get animation scene
     anim_scene = GetAnimationScene()
@@ -236,7 +243,7 @@ def gen_movie(
     int_animation_settings.update(animation_settings)
 
     if "FrameWindow" in int_animation_settings:
-        nframes_max = len(vtu_data.FileName)
+        nframes_max = len(raw_vtu_data.FileName)
         fw = int_animation_settings["FrameWindow"]
         fw = [max(fw[0], 0), min(fw[1], nframes_max - 1)]
 
