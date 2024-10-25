@@ -247,7 +247,13 @@ def gen_movie(
         display.SelectMapper = int_data_settings["render_mode"]
 
     # Default camera settings
+    title_fontsize = view_settings.pop("title_fontsize", 18)
+    label_fontsize = view_settings.pop("label_fontsize", 18)
     int_view_settings = dict(
+        xlabel_fontsize=label_fontsize,
+        ylabel_fontsize=label_fontsize,
+        xtitle_fontsize=title_fontsize,
+        ytitle_fontsize=title_fontsize,
         pos=[16.3, 3.1, 21.9],
         fpt=[0.0, 0.0, 5.0],
         up=[0.0, 1.0, -0.30],
@@ -264,6 +270,12 @@ def gen_movie(
         if int_view_settings["show_axes_grid"]:
             print("Rendering in 'Projected tetra' mode; hiding coord axes")
         view.AxesGrid.Visibility = 0
+
+    if view.AxesGrid.Visibility == 1:
+        view.AxesGrid.XTitleFontSize = int_view_settings["xtitle_fontsize"]
+        view.AxesGrid.YTitleFontSize = int_view_settings["ytitle_fontsize"]
+        view.AxesGrid.XLabelFontSize = int_view_settings["xlabel_fontsize"]
+        view.AxesGrid.YLabelFontSize = int_view_settings["ylabel_fontsize"]
 
     data_ndims = get_ugrid_props(vtu_data)["ndims"]
     view.InteractionMode = f"{data_ndims}D"
