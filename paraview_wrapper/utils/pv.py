@@ -3,6 +3,7 @@ import os.path
 from paraview.simple import (
     CreateView,
     Delete,
+    PVDReader,
     Show,
     Transform,
     XMLUnstructuredGridReader,
@@ -149,8 +150,9 @@ def get_paths(data_dir, basename, ext):
     # PV glov is extremely slow for some reason, use a custom version
     # fpaths = paraview.util.Glob(path=pattern)
     fpaths = my_glob(path=pattern)
-    pattern = re.compile(r".*_([0-9]*)." + ext)
-    fpaths = sorted(fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
+    if ext != "pvd":
+        pattern = re.compile(r".*_([0-9]*)." + ext)
+        fpaths = sorted(fpaths, key=lambda s: int(pattern.search(s).groups()[0]))
     return fpaths
 
 
@@ -164,28 +166,28 @@ def get_vtu_data(
     if registration_name is None:
         registration_name = gen_registration_name("vtu_data")
 
-    # Look for pvtu first
-    fpaths = get_paths(data_dir, basename, "pvtu")
-    if fpaths:
-        partitioned = True
-    else:
-        fpaths = get_paths(data_dir, basename, "vtu")
-        partitioned = False
+    # Look for different file types
+    for file_type in ["pvd", "pvtu", "vtu"]:
+        fpaths = get_paths(data_dir, basename, file_type)
+        if fpaths:
+            break
 
     # Check for multiple basenames if none was specified
     if not basename:
         unique_basenames = set(
             [
-                _extract_basename(p, partitioned, nektar_fname_fmt=nektar_fname_fmt)
+                _extract_basename(p, file_type, nektar_fname_fmt=nektar_fname_fmt)
                 for p in fpaths
             ]
         )
         if len(unique_basenames) > 1:
             print(
-                f"get_vtu_data: WARNING - Found pvtus/vtus with multiple basenames in {data_dir}; pass 'basename=' to choose one"
+                f"get_vtu_data: WARNING - Found pvds/pvtus/vtus with multiple basenames in {data_dir}; pass 'basename=' to choose one"
             )
 
-    if partitioned:
+    if file_type == "pvd":    
+        data = PVDReader(registrationName=registration_name, FileName=fpaths[0])
+    elif file_type == "pvtu":
         data = XMLPartitionedUnstructuredGridReader(
             registrationName=registration_name, FileName=fpaths
         )
