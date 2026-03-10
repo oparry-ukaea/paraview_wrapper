@@ -31,10 +31,14 @@ def gen_img(
     part_data_fname=None,
     part_props={},
     part_view_settings={},
+    time_lbl=None,
 ):
     if output_basename is None:
         output_basename = fluid_vtu_basename
     plotting_particles = part_data_fname is not None
+
+    if time_lbl is None:
+        time_lbl = float(output_time)
 
     # Camera position(s), focal point(s)
     int_fluid_view_settings = dict(
@@ -43,6 +47,7 @@ def gen_img(
         pscale=1.0,
         up=[0.0, 1.0, 0.0],
     )
+    img_size = fluid_view_settings.get("img_size", (1216, 776))
     int_fluid_view_settings.update(fluid_view_settings)
     int_view_settings = [int_fluid_view_settings]
     if plotting_particles:
@@ -56,9 +61,7 @@ def gen_img(
         int_view_settings.append(int_part_view_settings)
 
     # Ouput path
-    output_fpath = os.path.join(
-        output_dir, f"{output_basename}_t{str(output_time)}.png"
-    )
+    output_fpath = os.path.join(output_dir, f"{output_basename}_t{time_lbl}.png")
     # -------------------------------------------------------------------------
 
     # Read all Nektar vtus
@@ -173,7 +176,7 @@ def gen_img(
 
     # ------------------------------------------------------------------------------
     # Generate screenshot
-    layout.SetSize(1216, 776)
+    layout.SetSize(*img_size)
 
     # Set camera positions, focal points
     for view, settings in zip(views, int_view_settings):

@@ -1,10 +1,11 @@
-from paraview_wrapper.NESO import fluid_slice, gen_movie, gen_img, line_plot_1d, PyExpr
-from paraview_wrapper.utils import (
+from .paraview_wrapper.NESO import fluid_slice, gen_movie, gen_img, line_plot_1d, PyExpr
+from .paraview_wrapper.utils import (
     avi_to_mp4,
     get_desktop_dir,
     get_nektar_params,
     get_output_dir,
 )
+import math
 
 
 def driftwave_movie3D(data_dir, outfname_suffix="", **kwargs):
@@ -290,6 +291,47 @@ def t4c3_movie_coupled_zoomed_out(data_dir, host):
 
 def t4c3_movie_fluid_full(data_dir, host):
     hw3d_fluid_only_movie(data_dir, host=host, output_basename="t4c3_fluid-only_turb")
+
+
+def t6c6_RR2D_imgs(data_dir, var, output_dir=get_desktop_dir()):
+    """
+    Images of a 2DRR sim used in the t6c6 report.
+    """
+    fluid_props_common = dict(
+        cbar_pos=[0.485, 0.865], cbar_orient="Horizontal", cbar_title=var
+    )
+    n_fluid_props = dict(cbar_range=[0, 0.45])
+    T_fluid_props = dict()
+    fluid_props_var = dict(n=n_fluid_props, T=T_fluid_props)
+
+    fluid_props = dict(fluid_props_common)
+    if var in fluid_props_var:
+        fluid_props.update(fluid_props_var[var])
+
+    view_settings = dict(
+        fpt=[0.0, 0.0, 5.0],
+        pos=[0, 0, 273.205],
+        pscale=55.65,
+        up=[0, 1, 0],
+        img_size=(960, 816),
+    )
+
+    # Output times
+    Tfinal = 11.988
+    num_chks = 200
+    output_chks = [30, 60, 90, 120, 160, 200]
+    for output_chk in output_chks:
+        gen_img(
+            data_dir,
+            var,
+            output_chk,
+            time_lbl=f"{math.floor(1000 * Tfinal * (output_chk / num_chks)) / 1000}",
+            fluid_props=fluid_props,
+            fluid_vtu_basename="rr2d-implicit",
+            fluid_view_settings=view_settings,
+            output_basename=f"m6c6_RR2D_{var}",
+            output_dir=output_dir,
+        )
 
 
 def t4c4_HW3D_imgs(data_dir, var, output_dir=get_desktop_dir()):
