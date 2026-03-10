@@ -2,7 +2,6 @@ import os.path
 from paraview.simple import (
     _DisableFirstRenderCameraReset,
     AssignViewToLayout,
-    Connect,
     CreateView,
     GetAnimationScene,
     GetLayout,
@@ -115,9 +114,6 @@ def line_plot_1d(
             series_lbls = varnames
         elif series_lbl_mode == "basename":
             series_lbls = [os.path.basename(d) for d in data_dirs]
-
-    if host:
-        Connect(host)
 
     # Set line start-end points
     vtu_data = {}

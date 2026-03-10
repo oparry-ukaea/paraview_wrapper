@@ -60,7 +60,7 @@ def gen_img(
         int_part_view_settings.update(part_view_settings)
         int_view_settings.append(int_part_view_settings)
 
-    # Ouput path
+    # Output path
     output_fpath = os.path.join(output_dir, f"{output_basename}_t{time_lbl}.png")
     # -------------------------------------------------------------------------
 

@@ -5,7 +5,6 @@ import re
 from paraview.simple import (
     AssignViewToLayout,
     ColorBy,
-    Connect,
     CreateLayout,
     CreateView,
     GetAnimationScene,
@@ -71,9 +70,6 @@ def fluid_slice(
     #     )
     #     int_part_view_settings.update(part_view_settings)
     #     int_view_settings.append(int_part_view_settings)
-
-    if host:
-        Connect(host)
 
     # Read all Nektar vtus
     fluid_data = get_vtu_data(data_dir, basename=fluid_vtu_basename)

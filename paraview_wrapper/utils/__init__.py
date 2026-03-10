@@ -13,5 +13,5 @@ from .pv import (
     get_vtu_data,
     scale_data,
 )
-from .system import get_desktop_dir
+from .system import get_desktop_dir, make_dir_on_desktop
 from .video import avi_to_gif, avi_to_mp4

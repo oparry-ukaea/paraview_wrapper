@@ -3,7 +3,6 @@ import os.path
 from paraview.simple import (
     _DisableFirstRenderCameraReset,
     ColorBy,
-    Connect,
     FindViewOrCreate,
     GetAnimationScene,
     GetColorTransferFunction,
@@ -55,9 +54,6 @@ def gen_movie(
 
     # Output path
     output_fpath = os.path.join(output_dir, output_fname)
-
-    if host:
-        Connect(host)
 
     raw_vtu_data = get_vtu_data(data_dir, basename=vtu_basename)
 
